@@ -30,5 +30,6 @@ class Surface;
 #include "surface/surface_rgb1.hpp"
 #include "surface/surface_rgb332.hpp"
 #include "surface/surface_rgb565.hpp"
+#include "surface/qsurface.hpp"
 
 #endif // MODM_GES_SURFACE_HPP

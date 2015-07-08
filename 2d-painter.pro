@@ -29,13 +29,13 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 SOURCES += main.cpp\
 	mainwindow.cpp \
     color.cpp \
-    pixel_buffer.cpp
+    pixel_buffer.cpp \
+    surface/qsurface.cpp
 
 HEADERS  += mainwindow.h \
     surface.hpp \
     pixel_format.hpp \
     color.hpp \
-    surface/surface_argb8.hpp \
     surface/surface_l1.hpp \
     surface/surface_l4.hpp \
     surface/surface_l8.hpp \
@@ -45,6 +45,8 @@ HEADERS  += mainwindow.h \
     surface/surface_argb2.hpp \
     surface/surface_argb4.hpp \
     pixel_buffer.hpp \
-    surface/surface_argb1555.hpp
+    surface/surface_argb1555.hpp \
+    surface/qsurface.hpp \
+    surface/surface_rgba8888.hpp
 
 FORMS    += mainwindow.ui
