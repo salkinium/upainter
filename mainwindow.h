@@ -19,19 +19,14 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-	void
-	paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-
-	bool
-	event(QEvent *event) Q_DECL_OVERRIDE;
-
 private:
 	Ui::MainWindow *ui;
 	float scale;
 	float currentStepScaleFactor;
 	QTimer timer;
-	Surface<128, 64, PixelFormat::ARGB1555> surface;
+	Surface<128, 64, PixelFormat::ARGB8> surface;
 	QSurface qSurface;
+	qreal offset;
 };
 
 #endif // MAINWINDOW_H
