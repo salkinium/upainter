@@ -13,14 +13,13 @@ namespace ges
 {
 
 template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::L8> : public PixelBuffer
+class Surface<Width, Height, PixelFormat::L8>
 {
 public:
-	using UnderlyingColor = ColorL4;
+	using UnderlyingColor = ColorL8;
 
 public:
 	Surface() :
-		PixelBuffer(reinterpret_cast<uint8_t*>(buffer[0][0]), Width, Height, PixelFormat::L8),
 		buffer{{0}}
 	{}
 
@@ -38,7 +37,7 @@ public:
 
 	PixelBuffer
 	getPixelBuffer() const
-	{ return PixelBuffer(&buffer[0][0], Width, Height, PixelFormat::L8); }
+	{ return PixelBuffer(const_cast<uint8_t*>(&buffer[0][0]), Width, Height, PixelFormat::L8); }
 
 	void
 	clear()
@@ -57,7 +56,7 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			buffer[x][y] = color.getValue();
+			buffer[y][x] = color.getValue();
 			return true;
 		}
 		return false;
@@ -74,13 +73,13 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			return Color(UnderlyingColor(buffer[x][y]));
+			return Color(UnderlyingColor(buffer[y][x]));
 		}
 		return Color::Black;
 	}
 
 protected:
-	uint8_t buffer[Width][Height];
+	uint8_t buffer[Height][Width] ATTRIBUTE_ALIGNED(4);
 };
 
 } // namespace ges

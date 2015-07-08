@@ -13,14 +13,13 @@ namespace ges
 {
 
 template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::RGB565> : public PixelBuffer
+class Surface<Width, Height, PixelFormat::RGB565>
 {
 public:
 	using UnderlyingColor = ColorRGB565;
 
 public:
 	Surface() :
-		PixelBuffer(reinterpret_cast<uint8_t*>(buffer[0][0]), Width, Height, PixelFormat::RGB565),
 		buffer{{0}}
 	{}
 
@@ -38,7 +37,9 @@ public:
 
 	PixelBuffer
 	getPixelBuffer() const
-	{ return PixelBuffer(&buffer[0][0], Width, Height, PixelFormat::RGB565); }
+	{ return PixelBuffer(
+				reinterpret_cast<uint8_t*>(const_cast<uint16_t*>(&buffer[0][0])),
+				Width, Height, PixelFormat::RGB565); }
 
 	void
 	clear()
@@ -57,7 +58,7 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			buffer[x][y] = color.getValue();
+			buffer[y][x] = color.getValue();
 			return true;
 		}
 		return false;
@@ -74,13 +75,13 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			return Color(UnderlyingColor(buffer[x][y]));
+			return Color(UnderlyingColor(buffer[y][x]));
 		}
 		return Color::Black;
 	}
 
 protected:
-	uint16_t buffer[Width][Height];
+	uint16_t buffer[Height][Width];
 };
 
 } // namespace ges
