@@ -33,8 +33,8 @@ PixelFormat
 	Palette = 8,
 
 	RGB1 = 0x70 | 9,
-	RGBX8888 = 0x70 | 10,
-	RGBA8888 = 0x70 | 11,
+	RGB8 = 0x70 | 10,
+	ARGB8 = 0x70 | 11,
 };
 
 inline uint8_t
@@ -66,8 +66,8 @@ bitsPerPixel(PixelFormat format)
 		case PixelFormat::RGB565:
 			return 16;
 
-		case PixelFormat::RGBX8888:
-		case PixelFormat::RGBA8888:
+		case PixelFormat::RGB8:
+		case PixelFormat::ARGB8:
 			return 32;
 	}
 }
@@ -98,10 +98,10 @@ toQImageFormat(PixelFormat format)
 		case PixelFormat::RGB565:
 			return QImage::Format_RGB16;
 
-		case PixelFormat::RGBX8888:
+		case PixelFormat::RGB8:
 			return QImage::Format_RGBX8888;
 
-		case PixelFormat::RGBA8888:
+		case PixelFormat::ARGB8:
 			return QImage::Format_RGBA8888;
 
 		default:

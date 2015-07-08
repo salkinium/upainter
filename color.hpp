@@ -76,7 +76,7 @@ private:
 };
 
 // that was easy
-using ColorRGBA8888 = Color;
+using ColorARGB8 = Color;
 
 class
 ColorL1
@@ -269,15 +269,15 @@ private:
 };
 
 class
-ColorRGBX8888
+ColorRGB8
 {
 public:
 	explicit constexpr
-	ColorRGBX8888(const uint32_t value) :
+	ColorRGB8(const uint32_t value) :
 		value(0xff000000 | value) {}
 
 	constexpr
-	ColorRGBX8888(const Color color) :
+	ColorRGB8(const Color color) :
 		value(color.getValue() | 0xff000000) {}
 
 	constexpr uint16_t
@@ -289,7 +289,7 @@ public:
 	{ return Color(value); }
 
 	constexpr bool
-	operator== (const ColorRGBX8888 &other) const
+	operator== (const ColorRGB8 &other) const
 	{ return value == other.value; }
 
 private:

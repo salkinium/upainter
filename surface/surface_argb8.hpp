@@ -13,10 +13,10 @@ namespace ges
 {
 
 template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::RGBA8888>
+class Surface<Width, Height, PixelFormat::ARGB8>
 {
 public:
-	using UnderlyingColor = ColorRGBA8888;
+	using UnderlyingColor = ColorARGB8;
 
 public:
 	Surface() :
@@ -33,13 +33,13 @@ public:
 
 	static constexpr PixelFormat
 	getPixelFormat()
-	{ return PixelFormat::RGBA8888; }
+	{ return PixelFormat::ARGB8; }
 
 	PixelBuffer
 	getPixelBuffer() const
 	{ return PixelBuffer(
 				reinterpret_cast<uint8_t*>(const_cast<uint32_t*>(&buffer[0][0])),
-				Width, Height, PixelFormat::RGBA8888); }
+				Width, Height, PixelFormat::ARGB8); }
 
 	void
 	clear()

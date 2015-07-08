@@ -47,6 +47,6 @@ HEADERS  += mainwindow.h \
     pixel_buffer.hpp \
     surface/surface_argb1555.hpp \
     surface/qsurface.hpp \
-    surface/surface_rgba8888.hpp
+    surface/surface_argb8.hpp
 
 FORMS    += mainwindow.ui
