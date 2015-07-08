@@ -5,6 +5,8 @@ now with guaranteed less than 100% color!
 Here are some test pictures demonstrating several color depths as rendered on a 128x64 display in Qt using  QImage.
 No dithering was used, though.
 
+The colors are a rendering of the [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV) color space.
+
 ### 24bpp ARGB8
 
 This is what you have on you computer. 8bit for every color and for alpha channel.
