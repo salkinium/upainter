@@ -32,21 +32,13 @@ public:
 
 	constexpr
 	Color(const uint8_t red, const uint8_t green, const uint8_t blue) :
-#if XPCC__IS_LITTLE_ENDIAN
-		parts{blue, green, red, 0}
-#else
-		parts{0, red, green, blue}
-#endif
+		parts{red, green, blue, 0xff}
 	{}
 
 	constexpr
 	Color(const uint8_t red, const uint8_t green, const uint8_t blue,
 		  const uint8_t alpha) :
-#if XPCC__IS_LITTLE_ENDIAN
-		parts{alpha, red, green, blue}
-#else
-		parts{blue, green, red, alpha}
-#endif
+		parts{red, green, blue, alpha}
 	{}
 
 	constexpr uint32_t
@@ -55,35 +47,19 @@ public:
 
 	constexpr uint8_t
 	getRed() const
-#if XPCC__IS_LITTLE_ENDIAN
 	{ return parts[0]; }
-#else
-	{ return parts[3]; }
-#endif
 
 	constexpr uint8_t
 	getGreen() const
-#if XPCC__IS_LITTLE_ENDIAN
 	{ return parts[1]; }
-#else
-	{ return parts[2]; }
-#endif
 
 	constexpr uint8_t
 	getBlue() const
-#if XPCC__IS_LITTLE_ENDIAN
 	{ return parts[2]; }
-#else
-	{ return parts[1]; }
-#endif
 
 	constexpr uint8_t
 	getAlpha() const
-#if XPCC__IS_LITTLE_ENDIAN
 	{ return parts[3]; }
-#else
-	{ return parts[0]; }
-#endif
 
 	constexpr bool
 	operator== (const Color &other) const
@@ -97,13 +73,6 @@ private:
 		uint32_t composite;
 		uint8_t parts[4];
 	};
-
-	friend class ColorL1;
-	friend class ColorAL1;
-	friend class ColorL4;
-	friend class ColorL8;
-	friend class ColorARGB4;
-	friend class ColorRGB8;
 };
 
 // that was easy
