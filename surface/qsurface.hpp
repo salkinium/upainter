@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 #include "pixel_buffer.hpp"
+#include "../surface.hpp"
 
 namespace modm
 {
@@ -15,7 +16,7 @@ class QSurface : public QWidget
 	Q_OBJECT
 
 public:
-	QSurface(const PixelBuffer buffer, QWidget *parent = 0);
+	QSurface(const SurfaceDescription buffer, QWidget *parent = 0);
 
 private:
 	void
@@ -24,23 +25,6 @@ private:
 private:
 	QImage image;
 };
-
-
-
-//template< uint16_t Width, uint16_t Height, PixelFormat Format >
-//class QSurfaceWrapper
-//{
-//public:
-//	QSurfaceWrapper(Surface<Width, Height, Format> &device) :
-//		surface(device.getPixelBuffer()) {}
-
-//	QSurface &
-//	getQSurface()
-//	{ return surface; }
-
-//private:
-//	QSurface surface;
-//};
 
 } // namespace ges
 

@@ -9,7 +9,7 @@ namespace ges
 {
 
 //*
-QSurface::QSurface(const PixelBuffer buffer, QWidget *parent) :
+QSurface::QSurface(const SurfaceDescription buffer, QWidget *parent) :
 	QWidget(parent),
 	image(buffer.getData(), buffer.getWidth(), buffer.getHeight(), toQImageFormat(buffer.getFormat()))
 {

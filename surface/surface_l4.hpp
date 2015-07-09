@@ -12,8 +12,8 @@ namespace modm
 namespace ges
 {
 
-template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::L4>
+template< uint16_t Width, uint16_t Height, class BufferType>
+class Surface<Width, Height, PixelFormat::L4, BufferType>
 {
 	static_assert(Width % 2 == 0, "Surface width must be a multiple of 2!");
 public:
@@ -21,7 +21,7 @@ public:
 
 public:
 	Surface() :
-		buffer{{0}}
+		buffer(reinterpret_cast<uint8_t (*)[Height][Width/2]>(pixelBuffer.getData()))
 	{}
 
 	static constexpr uint16_t
@@ -36,20 +36,20 @@ public:
 	getPixelFormat()
 	{ return PixelFormat::L4; }
 
-	PixelBuffer
-	getPixelBuffer() const
-	{ return PixelBuffer(&buffer[0][0], Width, Height, PixelFormat::L4); }
+	SurfaceDescription
+	getDescription() const
+	{ return SurfaceDescription((uint8_t*)pixelBuffer.getData(), Width, Height, PixelFormat::L4); }
 
 	void
 	clear()
 	{
-		std::memset(buffer, 0, Width * Height / 2);
+		pixelBuffer.clear();
 	}
 
 	void
 	clear(UnderlyingColor color)
 	{
-		std::memset(buffer, color.getValue() * 0x11, Width * Height / 2);
+		pixelBuffer.clear(color.getValue() * 0x11);
 	}
 
 	bool
@@ -58,9 +58,9 @@ public:
 		if (x < Width and y < Height)
 		{
 			if (x & 0x01) {
-				buffer[y][x / 2] = (buffer[y][x / 2] & ~0xf0) | (color.getValue() << 4);
+				(*buffer)[y][x / 2] = ((*buffer)[y][x / 2] & ~0xf0) | (color.getValue() << 4);
 			} else {
-				buffer[y][x / 2] = (buffer[y][x / 2] & ~0x0f) | color.getValue();
+				(*buffer)[y][x / 2] = ((*buffer)[y][x / 2] & ~0x0f) | color.getValue();
 			}
 			return true;
 		}
@@ -79,16 +79,17 @@ public:
 		if (x < Width and y < Height)
 		{
 			if (x & 0x01) {
-				return Color(UnderlyingColor((buffer[y][x / 2] & 0xf0) >> 4));
+				return Color(UnderlyingColor(((*buffer)[y][x / 2] & 0xf0) >> 4));
 			} else {
-				return Color(UnderlyingColor( buffer[y][x / 2] & 0x0f));
+				return Color(UnderlyingColor( (*buffer)[y][x / 2] & 0x0f));
 			}
 		}
 		return Color::Black;
 	}
 
 protected:
-	uint8_t buffer[Height][Width / 2];
+	typename BufferType::template Buffer< Width * Height / 2 > pixelBuffer;
+	uint8_t (*buffer)[Height][Width / 2];
 };
 
 } // namespace ges

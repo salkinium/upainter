@@ -3,7 +3,8 @@
 
 #include <cstddef>
 #include <stdint.h>
-#include "pixel_format.hpp"
+#include <xpcc/architecture/utils.hpp>
+#include <cstring>
 
 namespace modm
 {
@@ -14,31 +15,58 @@ namespace ges
 class PixelBuffer
 {
 public:
-	PixelBuffer(uint8_t *const data,
-				const uint16_t width,
-				const uint16_t height,
-				const PixelFormat format);
+	template< std::size_t Length >
+	class Buffer
+	{
+		uint8_t data[Length] ATTRIBUTE_ALIGNED(4);
+	public:
+		Buffer() : data{0} {}
 
-	uint8_t *
-	getData() const;
+		inline const uint8_t *
+		getData() const
+		{ return data; }
 
-	std::size_t
-	getLength() const;
+		inline uint8_t *
+		getData()
+		{ return data; }
 
-	uint16_t
-	getWidth() const;
+		inline std::size_t
+		getLength() const
+		{ return Length; }
 
-	uint16_t
-	getHeight() const;
+		inline void
+		clear(uint8_t value = 0)
+		{ std::memset(data, value, Length); }
+	};
+};
 
-	PixelFormat
-	getFormat() const;
+template< uint8_t *const Address >
+class StaticPixelBuffer
+{
+public:
+	template< std::size_t Length >
+	class Buffer
+	{
+	public:
+		Buffer()
+		{ clear(); }
 
-private:
-	uint8_t *const data;
-	const uint16_t width;
-	const uint16_t height;
-	const PixelFormat format;
+		inline const uint8_t *
+		getData() const
+		{ return Address; }
+
+		inline uint8_t *
+		getData()
+		{ return Address; }
+
+		inline std::size_t
+		getLength() const
+		{ return Length; }
+
+		inline void
+		clear(uint8_t value = 0)
+		{ std::memset(Address, value, Length); }
+	};
 };
 
 } // namespace ges

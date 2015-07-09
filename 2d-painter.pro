@@ -29,7 +29,6 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 SOURCES += main.cpp\
 	mainwindow.cpp \
     color.cpp \
-    pixel_buffer.cpp \
     surface/qsurface.cpp
 
 HEADERS  += mainwindow.h \

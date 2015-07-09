@@ -11,6 +11,8 @@ namespace Ui {
 class MainWindow;
 }
 
+static uint8_t staticBuffer[128*64*4];
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -24,7 +26,8 @@ private:
 	float scale;
 	float currentStepScaleFactor;
 	QTimer timer;
-	Surface<128, 64, PixelFormat::ARGB8> surface;
+	Surface<128, 64, PixelFormat::ARGB8, StaticPixelBuffer<staticBuffer>> surface;
+//	Surface<128, 64, PixelFormat::RGB565> surface;
 	QSurface qSurface;
 	qreal offset;
 };

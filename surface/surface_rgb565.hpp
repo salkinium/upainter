@@ -12,15 +12,15 @@ namespace modm
 namespace ges
 {
 
-template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::RGB565>
+template< uint16_t Width, uint16_t Height, class BufferType>
+class Surface<Width, Height, PixelFormat::RGB565, BufferType>
 {
 public:
 	using UnderlyingColor = ColorRGB565;
 
 public:
 	Surface() :
-		buffer{{0}}
+		buffer(reinterpret_cast<uint16_t (*)[Height][Width]>(pixelBuffer.getData()))
 	{}
 
 	static constexpr uint16_t
@@ -35,22 +35,20 @@ public:
 	getPixelFormat()
 	{ return PixelFormat::RGB565; }
 
-	PixelBuffer
-	getPixelBuffer() const
-	{ return PixelBuffer(
-				reinterpret_cast<uint8_t*>(const_cast<uint16_t*>(&buffer[0][0])),
-				Width, Height, PixelFormat::RGB565); }
+	SurfaceDescription
+	getDescription() const
+	{ return SurfaceDescription((uint8_t*)pixelBuffer.getData(), Width, Height, PixelFormat::RGB565); }
 
 	void
 	clear()
 	{
-		std::memset(buffer, 0, Width * Height * 2);
+		pixelBuffer.clear();
 	}
 
 	void
 	clear(UnderlyingColor color)
 	{
-		std::fill_n(&buffer[0][0], Width * Height, color.getValue());
+		std::fill_n(&(*buffer)[0][0], Width * Height, color.getValue());
 	}
 
 	bool
@@ -58,7 +56,7 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			buffer[y][x] = color.getValue();
+			(*buffer)[y][x] = color.getValue();
 			return true;
 		}
 		return false;
@@ -75,13 +73,14 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			return Color(UnderlyingColor(buffer[y][x]));
+			return Color(UnderlyingColor((*buffer)[y][x]));
 		}
 		return Color::Black;
 	}
 
 protected:
-	uint16_t buffer[Height][Width];
+	typename BufferType::template Buffer< Width * Height * sizeof(uint16_t) > pixelBuffer;
+	uint16_t (*buffer)[Height][Width];
 };
 
 } // namespace ges

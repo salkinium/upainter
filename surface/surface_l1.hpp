@@ -12,8 +12,8 @@ namespace modm
 namespace ges
 {
 
-template< uint16_t Width, uint16_t Height>
-class Surface<Width, Height, PixelFormat::L1>
+template< uint16_t Width, uint16_t Height, class BufferType>
+class Surface<Width, Height, PixelFormat::L1, BufferType>
 {
 	static_assert(Width % 8 == 0, "Surface width must be a multiple of 8!");
 public:
@@ -21,7 +21,7 @@ public:
 
 public:
 	Surface() :
-		buffer{{0}}
+		buffer(reinterpret_cast<uint8_t (*)[Height][Width/8]>(pixelBuffer.getData()))
 	{}
 
 	static constexpr uint16_t
@@ -36,20 +36,20 @@ public:
 	getPixelFormat()
 	{ return PixelFormat::L1; }
 
-	PixelBuffer
-	getPixelBuffer() const
-	{ return PixelBuffer(const_cast<uint8_t*>(&buffer[0][0]), Width, Height, PixelFormat::L1); }
+	SurfaceDescription
+	getDescription() const
+	{ return SurfaceDescription((uint8_t*)pixelBuffer.getData(), Width, Height, PixelFormat::L1); }
 
 	void
 	clear()
 	{
-		std::memset(buffer, 0, Width * Height / 8);
+		pixelBuffer.clear();
 	}
 
 	void
 	clear(UnderlyingColor color)
 	{
-		std::memset(buffer, color.getValue() * 0xff, Width * Height / 8);
+		pixelBuffer.clear(color.getValue() * 0xff);
 	}
 
 	bool
@@ -58,9 +58,9 @@ public:
 		if (x < Width and y < Height)
 		{
 			if (color.getValue() == 0) {
-				buffer[y][x / 8] &= ~(1 << (x & 0x07));
+				(*buffer)[y][x / 8] &= ~(1 << (x & 0x07));
 			} else {
-				buffer[y][x / 8] |=  (1 << (x & 0x07));
+				(*buffer)[y][x / 8] |=  (1 << (x & 0x07));
 			}
 			return true;
 		}
@@ -70,7 +70,7 @@ public:
 	bool
 	clearPixel(uint16_t x, uint16_t y)
 	{
-		return setPixel(x, y, ColorL1(0));
+		return setPixel(x, y, UnderlyingColor(0));
 	}
 
 	Color
@@ -78,14 +78,15 @@ public:
 	{
 		if (x < Width and y < Height)
 		{
-			if (buffer[y][x / 8] & (1 << (x & 0x07)))
+			if ((*buffer)[y][x / 8] & (1 << (x & 0x07)))
 				return Color::White;
 		}
 		return Color::Black;
 	}
 
 protected:
-	uint8_t buffer[Height][Width / 8];
+	typename BufferType::template Buffer< Width * Height / 8 > pixelBuffer;
+	uint8_t (*buffer)[Height][Width / 8];
 };
 
 } // namespace ges
