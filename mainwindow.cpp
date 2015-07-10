@@ -13,14 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow),
 	scale(10), currentStepScaleFactor(1),
 	surface(buffer),
-	qSurface(surface), offset(0)
+	qDisplay(surface), offset(0)
 {
 	ui->setupUi(this);
 
 	this->setGeometry(0, 0, surface.getWidth() * 10+25, surface.getHeight()* 10+60);
 
 	QHBoxLayout *layout = new QHBoxLayout;
-	layout->addWidget(&qSurface);
+	layout->addWidget(&qDisplay);
 	setCentralWidget(new QWidget);
 	centralWidget()->setLayout(layout);
 

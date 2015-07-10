@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "surface.hpp"
+#include "qdisplay.hpp"
 #include <QTimer>
 
 using namespace modm::ges;
@@ -30,7 +31,7 @@ private:
 	QTimer timer;
 	FormattedSurface surface;
 	FormattedSurface::Buffer<128, 64> buffer;
-	QSurface qSurface;
+	QDisplay qDisplay;
 	qreal offset;
 };
 

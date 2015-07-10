@@ -12,7 +12,7 @@ namespace ges
 template<>
 class Surface<PixelFormat::ARGB2>
 {
-	friend class QSurface;
+	friend class QDisplay;
 	static constexpr PixelFormat Format = PixelFormat::ARGB2;
 public:
 	using UnderlyingColor = ColorARGB2;

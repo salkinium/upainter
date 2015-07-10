@@ -15,7 +15,7 @@ namespace ges
 template<>
 class Surface<PixelFormat::L8>
 {
-	friend class QSurface;
+	friend class QDisplay;
 	static constexpr PixelFormat Format = PixelFormat::L8;
 public:
 	using UnderlyingColor = ColorL8;

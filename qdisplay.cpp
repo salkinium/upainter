@@ -1,4 +1,4 @@
-#include "qsurface.hpp"
+#include "qdisplay.hpp"
 
 #include "color.hpp"
 
@@ -8,7 +8,7 @@ namespace modm
 namespace ges
 {
 
-QSurface::QSurface(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent) :
+QDisplay::QDisplay(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent) :
 	QWidget(parent), image(data, width, height, toQImageFormat(format))
 {
 	// manually create color tables and attach to image if necessary
@@ -63,7 +63,7 @@ QSurface::QSurface(const uint8_t *const data, const uint8_t width, const uint8_t
 }
 
 void
-QSurface::paintEvent(QPaintEvent */*event*/)
+QDisplay::paintEvent(QPaintEvent */*event*/)
 {
 	QPainter painter(this);
 	painter.scale(10, 10);

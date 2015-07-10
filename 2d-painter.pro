@@ -27,24 +27,25 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
 SOURCES += main.cpp\
 	mainwindow.cpp \
-    color.cpp \
-    surface/qsurface.cpp
+	color.cpp \
+	qdisplay.cpp
 
 HEADERS  += mainwindow.h \
-    surface.hpp \
-    pixel_format.hpp \
-    color.hpp \
-    surface/surface_l1.hpp \
-    surface/surface_l4.hpp \
-    surface/surface_l8.hpp \
-    surface/surface_rgb1.hpp \
-    surface/surface_rgb332.hpp \
-    surface/surface_rgb565.hpp \
-    surface/surface_argb2.hpp \
-    surface/surface_argb4.hpp \
-    pixel_buffer.hpp \
-    surface/surface_argb1555.hpp \
-    surface/qsurface.hpp \
-    surface/surface_argb8.hpp
+	    surface.hpp \
+	    pixel_format.hpp \
+	    color.hpp \
+	    surface/surface_l1.hpp \
+	    surface/surface_l4.hpp \
+	    surface/surface_l8.hpp \
+	    surface/surface_rgb1.hpp \
+	    surface/surface_rgb332.hpp \
+	    surface/surface_rgb565.hpp \
+	    surface/surface_argb2.hpp \
+	    surface/surface_argb4.hpp \
+	    pixel_buffer.hpp \
+	    surface/surface_argb1555.hpp \
+	    surface/surface_argb8.hpp \
+	    accelerator.hpp \
+	    qdisplay.hpp
 
 FORMS    += mainwindow.ui
