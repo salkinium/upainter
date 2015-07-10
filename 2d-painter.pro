@@ -36,16 +36,9 @@ HEADERS  += mainwindow.h \
 	    color.hpp \
 	    surface/surface_l1.hpp \
 	    surface/surface_l4.hpp \
-	    surface/surface_l8.hpp \
-	    surface/surface_rgb1.hpp \
-	    surface/surface_rgb332.hpp \
-	    surface/surface_rgb565.hpp \
-	    surface/surface_argb2.hpp \
-	    surface/surface_argb4.hpp \
 	    pixel_buffer.hpp \
-	    surface/surface_argb1555.hpp \
-	    surface/surface_argb8.hpp \
 	    accelerator.hpp \
-	    qdisplay.hpp
+	    qdisplay.hpp \
+    pixel_color.hpp
 
 FORMS    += mainwindow.ui

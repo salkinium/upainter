@@ -3,9 +3,6 @@
 #	error	"Don't include this file directly, use 'surface.hpp' instead!"
 #endif
 
-#include <cstring>
-#include <algorithm>
-
 namespace modm
 {
 
@@ -18,7 +15,7 @@ class Surface<PixelFormat::L4>
 	friend class QDisplay;
 	static constexpr PixelFormat Format = PixelFormat::L4;
 public:
-	using UnderlyingColor = ColorL4;
+	using NativeColor = PixelColor<PixelFormat::L4>;
 
 	template< uint16_t Width, uint16_t Height >
 	using Buffer = PixelBuffer<Width, Height, Format>;
@@ -52,13 +49,13 @@ public:
 	}
 
 	void
-	clear(UnderlyingColor color)
+	clear(NativeColor color)
 	{
 		std::memset(buffer, color.getValue() * 0x11, std::size_t(width) * height / 2);
 	}
 
 	bool
-	setPixel(uint16_t x, uint16_t y, UnderlyingColor color)
+	setPixel(uint16_t x, uint16_t y, NativeColor color)
 	{
 		if (x < width and y < height)
 		{
@@ -75,7 +72,7 @@ public:
 	bool
 	clearPixel(uint16_t x, uint16_t y)
 	{
-		return setPixel(x, y, UnderlyingColor(0));
+		return setPixel(x, y, NativeColor(0));
 	}
 
 	Color
@@ -84,9 +81,9 @@ public:
 		if (x < width and y < height)
 		{
 			if (x & 0x01) {
-				return Color(UnderlyingColor((buffer[(y * width + x) / 2] & 0xf0) >> 4));
+				return Color(NativeColor((buffer[(y * width + x) / 2] & 0xf0) >> 4));
 			} else {
-				return Color(UnderlyingColor( buffer[(y * width + x) / 2] & 0x0f));
+				return Color(NativeColor( buffer[(y * width + x) / 2] & 0x0f));
 			}
 		}
 		return Color::Black;

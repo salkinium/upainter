@@ -3,9 +3,6 @@
 #	error	"Don't include this file directly, use 'surface.hpp' instead!"
 #endif
 
-#include <cstring>
-#include <algorithm>
-
 namespace modm
 {
 
@@ -18,7 +15,7 @@ class Surface<PixelFormat::L1>
 	friend class QDisplay;
 	static constexpr PixelFormat Format = PixelFormat::L1;
 public:
-	using UnderlyingColor = ColorL1;
+	using NativeColor = PixelColor<PixelFormat::L1>;
 
 	template< uint16_t Width, uint16_t Height >
 	using Buffer = PixelBuffer<Width, Height, Format>;
@@ -52,13 +49,13 @@ public:
 	}
 
 	void
-	clear(UnderlyingColor color)
+	clear(NativeColor color)
 	{
 		std::memset(buffer, color.getValue() * 0xff, std::size_t(width) * height / 8);
 	}
 
 	bool
-	setPixel(uint16_t x, uint16_t y, UnderlyingColor color)
+	setPixel(uint16_t x, uint16_t y, NativeColor color)
 	{
 		if (x < width and y < height)
 		{
@@ -75,7 +72,7 @@ public:
 	bool
 	clearPixel(uint16_t x, uint16_t y)
 	{
-		return setPixel(x, y, UnderlyingColor(0));
+		return setPixel(x, y, NativeColor(0));
 	}
 
 	Color
