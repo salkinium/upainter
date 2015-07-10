@@ -48,13 +48,13 @@ public:
 	void
 	clear()
 	{
-		std::memset(buffer, 0, uint32_t(width) * height / 2);
+		std::memset(buffer, 0, std::size_t(width) * height / 2);
 	}
 
 	void
 	clear(UnderlyingColor color)
 	{
-		std::memset(buffer, color.getValue() * 0x11, uint32_t(width) * height / 2);
+		std::memset(buffer, color.getValue() * 0x11, std::size_t(width) * height / 2);
 	}
 
 	bool
