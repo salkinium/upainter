@@ -8,18 +8,16 @@ namespace modm
 namespace ges
 {
 
-//*
-QSurface::QSurface(const SurfaceDescription buffer, QWidget *parent) :
-	QWidget(parent),
-	image(buffer.getData(), buffer.getWidth(), buffer.getHeight(), toQImageFormat(buffer.getFormat()))
+QSurface::QSurface(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent) :
+	QWidget(parent), image(data, width, height, toQImageFormat(format))
 {
 	// manually create color tables and attach to image if necessary
-	if (buffer.getFormat() == PixelFormat::L1)
+	if (format == PixelFormat::L1)
 	{
 		QVector<QRgb> table{qRgb(0,0,0), qRgb(0xff, 0xff, 0xff)};
 		image.setColorTable(table);
 	}
-	else if (buffer.getFormat() == PixelFormat::L8)
+	else if (format == PixelFormat::L8)
 	{
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
@@ -28,7 +26,7 @@ QSurface::QSurface(const SurfaceDescription buffer, QWidget *parent) :
 		}
 		image.setColorTable(table);
 	}
-	else if (buffer.getFormat() == PixelFormat::RGB1)
+	else if (format == PixelFormat::RGB1)
 	{
 		QVector<QRgb> table{
 			qRgb(0,0,0),
@@ -42,7 +40,7 @@ QSurface::QSurface(const SurfaceDescription buffer, QWidget *parent) :
 		};
 		image.setColorTable(table);
 	}
-	else if (buffer.getFormat() == PixelFormat::RGB332)
+	else if (format == PixelFormat::RGB332)
 	{
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
@@ -52,7 +50,7 @@ QSurface::QSurface(const SurfaceDescription buffer, QWidget *parent) :
 		}
 		image.setColorTable(table);
 	}
-	else if (buffer.getFormat() == PixelFormat::ARGB2)
+	else if (format == PixelFormat::ARGB2)
 	{
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
@@ -72,7 +70,6 @@ QSurface::paintEvent(QPaintEvent */*event*/)
 	painter.drawImage(0, 0, image);
 	painter.end();
 }
-//*/
 
 } // namespace ges
 

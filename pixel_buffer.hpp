@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
 #include <cstring>
+#include "pixel_format.hpp"
 
 namespace modm
 {
@@ -12,61 +13,30 @@ namespace modm
 namespace ges
 {
 
+template< uint16_t Width, uint16_t Height, PixelFormat Format >
 class PixelBuffer
 {
+	static_assert((Format != PixelFormat::L1) or (Width % 8 == 0),
+				  "Pixel buffer width must be a multiple of 8!");
+	static_assert((Format != PixelFormat::L4) or (Width % 2 == 0),
+				  "Pixel buffer width must be a multiple of 2!");
 public:
-	template< std::size_t Length >
-	class Buffer
-	{
-		uint8_t data[Length] ATTRIBUTE_ALIGNED(4);
-	public:
-		Buffer() : data{0} {}
+	PixelBuffer() : data{0} {}
 
-		inline const uint8_t *
-		getData() const
-		{ return data; }
+	inline const uint8_t *
+	getData() const
+	{ return data; }
 
-		inline uint8_t *
-		getData()
-		{ return data; }
+	inline uint8_t *
+	getData()
+	{ return data; }
 
-		inline std::size_t
-		getLength() const
-		{ return Length; }
+	static constexpr std::size_t
+	getLength()
+	{ return Width * Height * bitsPerPixelCT(Format) / 8; }
 
-		inline void
-		clear(uint8_t value = 0)
-		{ std::memset(data, value, Length); }
-	};
-};
-
-template< uint8_t *const Address >
-class StaticPixelBuffer
-{
-public:
-	template< std::size_t Length >
-	class Buffer
-	{
-	public:
-		Buffer()
-		{ clear(); }
-
-		inline const uint8_t *
-		getData() const
-		{ return Address; }
-
-		inline uint8_t *
-		getData()
-		{ return Address; }
-
-		inline std::size_t
-		getLength() const
-		{ return Length; }
-
-		inline void
-		clear(uint8_t value = 0)
-		{ std::memset(Address, value, Length); }
-	};
+private:
+	uint8_t data[getLength()] ATTRIBUTE_ALIGNED(4);
 };
 
 } // namespace ges

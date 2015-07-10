@@ -5,7 +5,8 @@
 #include "pixel_format.hpp"
 #include "pixel_buffer.hpp"
 #include "color.hpp"
-#include <xpcc/architecture/utils.hpp>
+#include <cstring>
+#include <algorithm>
 
 namespace modm
 {
@@ -13,58 +14,8 @@ namespace modm
 namespace ges
 {
 
-template< uint16_t Width, uint16_t Height, PixelFormat Format, class BufferType = PixelBuffer >
+template< PixelFormat Format >
 class Surface;
-
-class
-SurfaceDescription
-{
-public:
-	inline
-	SurfaceDescription(uint8_t *const data,
-					   const uint16_t width,
-					   const uint16_t height,
-					   const PixelFormat format) :
-		data(data), width(width), height(height), format(format)
-	{
-	}
-
-	inline uint8_t *
-	getData() const
-	{
-		return data;
-	}
-
-	inline std::size_t
-	getLength() const
-	{
-		return width * height * bitsPerPixel(format) / 8;
-	}
-
-	inline uint16_t
-	getWidth() const
-	{
-		return width;
-	}
-
-	inline uint16_t
-	getHeight() const
-	{
-		return height;
-	}
-
-	inline PixelFormat
-	getFormat() const
-	{
-		return format;
-	}
-
-private:
-	uint8_t *const data;
-	const uint16_t width;
-	const uint16_t height;
-	const PixelFormat format;
-};
 
 } // namespace ges
 

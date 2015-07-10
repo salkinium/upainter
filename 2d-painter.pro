@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = 2d-painter
 TEMPLATE = app
 
-# to make use of the full C++11, you need to use MinGW on Windows
 CONFIG += c++11
 
 macx {

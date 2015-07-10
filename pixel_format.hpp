@@ -14,18 +14,9 @@ enum class
 PixelFormat
 {
 	ARGB1555 = 0,
-
-	L1Vertical = 0xf0 | 1,
-	L1Horizontal = 1,
-	L1 = L1Horizontal,
-	L2Vertical = 0xf0 | 0x70 | 12,
-	L2Horizontal = 0x70 | 12,
-	L2 = L2Horizontal,
-	L4Vertical = 0xf0 | 2,
-	L4Horizontal = 2,
-	L4 = L4Horizontal,
+	L1 = 1,
+	L4 = 2,
 	L8 = 3,
-
 	RGB332 = 4,
 	ARGB2 = 5,
 	ARGB4 = 6,
@@ -35,6 +26,7 @@ PixelFormat
 	RGB1 = 0x70 | 9,
 	RGB8 = 0x70 | 10,
 	ARGB8 = 0x70 | 11,
+	L2 = 0x70 | 12,
 };
 
 inline uint8_t
@@ -42,16 +34,13 @@ bitsPerPixel(PixelFormat format)
 {
 	switch(format)
 	{
-		case PixelFormat::L1Vertical:
-		case PixelFormat::L1Horizontal:
+		case PixelFormat::L1:
 			return 1;
 
-		case PixelFormat::L2Vertical:
-		case PixelFormat::L2Horizontal:
+		case PixelFormat::L2:
 			return 2;
 
-		case PixelFormat::L4Vertical:
-		case PixelFormat::L4Horizontal:
+		case PixelFormat::L4:
 			return 4;
 
 		case PixelFormat::L8:
@@ -70,6 +59,23 @@ bitsPerPixel(PixelFormat format)
 		case PixelFormat::ARGB8:
 			return 32;
 	}
+}
+
+static inline constexpr uint8_t
+bitsPerPixelCT(PixelFormat format)
+{
+	return  (format == PixelFormat::L1 ? 1 :
+			(format == PixelFormat::L2 ? 2 :
+			(format == PixelFormat::L4 ? 4 :
+			((format == PixelFormat::L8) or
+			 (format == PixelFormat::RGB332) or
+			 (format == PixelFormat::RGB1) or
+			 (format == PixelFormat::ARGB2) or
+			 (format == PixelFormat::Palette) ? 8 :
+			((format == PixelFormat::ARGB4) or
+			 (format == PixelFormat::ARGB1555) or
+			 (format == PixelFormat::RGB565) ? 16 :
+			32)))));
 }
 
 inline QImage::Format

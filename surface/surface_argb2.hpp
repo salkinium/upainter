@@ -3,60 +3,63 @@
 #	error	"Don't include this file directly, use 'surface.hpp' instead!"
 #endif
 
-#include <cstring>
-#include <algorithm>
-
 namespace modm
 {
 
 namespace ges
 {
 
-template< uint16_t Width, uint16_t Height, class BufferType>
-class Surface<Width, Height, PixelFormat::ARGB2, BufferType>
+template<>
+class Surface<PixelFormat::ARGB2>
 {
+	friend class QSurface;
+	static constexpr PixelFormat Format = PixelFormat::ARGB2;
 public:
 	using UnderlyingColor = ColorARGB2;
 
+	template< uint16_t Width, uint16_t Height >
+	using Buffer = PixelBuffer<Width, Height, Format>;
+
 public:
-	Surface() :
-		buffer(reinterpret_cast<uint8_t (*)[Height][Width]>(pixelBuffer.getData()))
+	Surface(uint8_t *const buffer, const uint16_t width, const uint16_t height) :
+		width(width), height(height), buffer(buffer)
 	{}
 
-	static constexpr uint16_t
-	getWidth()
-	{ return Width; }
+	template< uint16_t Width, uint16_t Height >
+	Surface(PixelBuffer<Width, Height, Format> &buffer) :
+		Surface(buffer.getData(), Width, Height)
+	{}
 
-	static constexpr uint16_t
-	getHeight()
-	{ return Height; }
+	uint16_t
+	getWidth() const
+	{ return width; }
+
+	uint16_t
+	getHeight() const
+	{ return height; }
 
 	static constexpr PixelFormat
 	getPixelFormat()
-	{ return PixelFormat::ARGB2; }
-
-	SurfaceDescription
-	getDescription() const
-	{ return SurfaceDescription((uint8_t*)pixelBuffer.getData(), Width, Height, PixelFormat::ARGB2); }
+	{ return Format; }
 
 	void
 	clear()
 	{
-		pixelBuffer.clear();
+		std::memset(buffer, 0, uint32_t(width) * height);
 	}
 
 	void
 	clear(UnderlyingColor color)
 	{
-		pixelBuffer.clear(color.getValue());
+		std::memset(buffer, color.getValue(), uint32_t(width) * height);
 	}
 
 	bool
 	setPixel(uint16_t x, uint16_t y, UnderlyingColor color)
 	{
-		if (x < Width and y < Height)
+		if (x < width and y < height)
 		{
-			(*buffer)[y][x] = color.getValue();
+			buffer[y * width + x] = color.getValue();
 			return true;
 		}
 		return false;
@@ -71,16 +74,17 @@ public:
 	Color
 	getPixel(uint16_t x, uint16_t y) const
 	{
-		if (x < Width and y < Height)
+		if (x < width and y < height)
 		{
-			return Color(UnderlyingColor((*buffer)[y][x]));
+			return Color(UnderlyingColor(buffer[y * width + x]));
 		}
 		return Color::Black;
 	}
 
 protected:
-	typename BufferType::template Buffer< Width * Height > pixelBuffer;
-	uint8_t (*buffer)[Height][Width];
+	const uint16_t width;
+	const uint16_t height;
+	uint8_t *const buffer;
 };
 
 } // namespace ges

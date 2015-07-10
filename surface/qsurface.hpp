@@ -16,7 +16,13 @@ class QSurface : public QWidget
 	Q_OBJECT
 
 public:
-	QSurface(const SurfaceDescription buffer, QWidget *parent = 0);
+	template< PixelFormat Format >
+	QSurface(const Surface<Format> &surface, QWidget *parent = 0) :
+		QSurface((uint8_t*)surface.buffer, surface.width, surface.height, Format, parent)
+	{}
+
+protected:
+	QSurface(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent = 0);
 
 private:
 	void

@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
 	scale(10), currentStepScaleFactor(1),
-	qSurface(surface.getDescription()), offset(0)
+	surface(buffer),
+	qSurface(surface), offset(0)
 {
 	ui->setupUi(this);
 
