@@ -18,11 +18,12 @@ class QDisplay : public QWidget
 public:
 	template< PixelFormat Format >
 	QDisplay(const Surface<Format> &surface, QWidget *parent = 0) :
-		QDisplay((uint8_t*)surface.buffer, surface.width, surface.height, Format, parent)
+		QDisplay((uchar*)surface.buffer, surface.width, surface.height, surface.getPixelFormat(), parent)
 	{}
 
 protected:
-	QDisplay(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent = 0);
+	// this needs uchar*, NOT const uchar *. The latter will call the wrong QImage constructor.
+	QDisplay(uchar *data, const uint16_t width, const uint16_t height, const PixelFormat format, QWidget *parent = 0);
 
 private:
 	void

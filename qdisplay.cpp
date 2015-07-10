@@ -1,5 +1,4 @@
 #include "qdisplay.hpp"
-
 #include "color.hpp"
 
 namespace modm
@@ -8,7 +7,7 @@ namespace modm
 namespace ges
 {
 
-QDisplay::QDisplay(const uint8_t *const data, const uint8_t width, const uint8_t height, const PixelFormat format, QWidget *parent) :
+QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, const PixelFormat format, QWidget *parent) :
 	QWidget(parent), image(data, width, height, toQImageFormat(format))
 {
 	// manually create color tables and attach to image if necessary
@@ -45,7 +44,7 @@ QDisplay::QDisplay(const uint8_t *const data, const uint8_t width, const uint8_t
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
 		{
-			Color c = Color(ColorRGB332(uint8_t(i)));
+			Color c = Color(PixelColor<PixelFormat::RGB332>(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
@@ -55,7 +54,7 @@ QDisplay::QDisplay(const uint8_t *const data, const uint8_t width, const uint8_t
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
 		{
-			Color c = Color(ColorARGB2(i));
+			Color c = Color(PixelColor<PixelFormat::ARGB2>(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
