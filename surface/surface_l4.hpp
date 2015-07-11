@@ -75,18 +75,18 @@ public:
 		return setPixel(x, y, NativeColor(0));
 	}
 
-	Color
+	NativeColor
 	getPixel(uint16_t x, uint16_t y) const
 	{
 		if (x < width and y < height)
 		{
 			if (x & 0x01) {
-				return Color(NativeColor((buffer[(y * width + x) / 2] & 0xf0) >> 4));
+				return NativeColor((buffer[(y * width + x) / 2] & 0xf0) >> 4);
 			} else {
-				return Color(NativeColor( buffer[(y * width + x) / 2] & 0x0f));
+				return NativeColor( buffer[(y * width + x) / 2] & 0x0f);
 			}
 		}
-		return Color::Black;
+		return NativeColor(0);
 	}
 
 protected:
