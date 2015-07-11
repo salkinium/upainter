@@ -6,6 +6,7 @@ Here are some test pictures demonstrating several color depths as rendered on a 
 No dithering was used, though.
 
 The colors are a rendering of the [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV) color space.
+Wikipedia also has a [list of monochrome and RGB palettes](https://en.wikipedia.org/wiki/List_of_monochrome_and_RGB_palettes).
 
 ### 24bpp ARGB8
 
