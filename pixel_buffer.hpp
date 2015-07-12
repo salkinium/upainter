@@ -6,6 +6,7 @@
 #include <xpcc/architecture/utils.hpp>
 #include <cstring>
 #include "pixel_format.hpp"
+#include "pixel_color.hpp"
 
 namespace modm
 {
@@ -33,7 +34,7 @@ public:
 
 	static constexpr std::size_t
 	getLength()
-	{ return Width * Height * bitsPerPixelCT(Format) / 8; }
+	{ return Width * Height * PixelColor<Format>::Bits / 8; }
 
 private:
 	uint8_t data[getLength()] ATTRIBUTE_ALIGNED(4);

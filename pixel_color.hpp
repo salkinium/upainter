@@ -20,6 +20,7 @@ class PixelColor<PixelFormat::ARGB8>
 public:
 	using Type = uint32_t;
 	static constexpr uint8_t Depth = 24;
+	static constexpr uint8_t Bits = 32;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -51,6 +52,7 @@ class PixelColor<PixelFormat::L1>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 1;
+	static constexpr uint8_t Bits = 1;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -85,6 +87,7 @@ class PixelColor<PixelFormat::L4>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 4;
+	static constexpr uint8_t Bits = 4;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -118,6 +121,7 @@ class PixelColor<PixelFormat::L8>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 8;
+	static constexpr uint8_t Bits = 8;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -151,6 +155,7 @@ class PixelColor<PixelFormat::RGB1>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 3;
+	static constexpr uint8_t Bits = 8;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -187,6 +192,7 @@ class PixelColor<PixelFormat::RGB332>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 8;
+	static constexpr uint8_t Bits = 8;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -223,6 +229,7 @@ class PixelColor<PixelFormat::RGB565>
 public:
 	using Type = uint16_t;
 	static constexpr uint8_t Depth = 16;
+	static constexpr uint8_t Bits = 16;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -259,6 +266,7 @@ class PixelColor<PixelFormat::RGB8>
 public:
 	using Type = uint32_t;
 	static constexpr uint8_t Depth = 24;
+	static constexpr uint8_t Bits = 32;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -290,6 +298,7 @@ class PixelColor<PixelFormat::ARGB2>
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 6;
+	static constexpr uint8_t Bits = 8;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -327,6 +336,7 @@ class PixelColor<PixelFormat::ARGB4>
 public:
 	using Type = uint16_t;
 	static constexpr uint8_t Depth = 12;
+	static constexpr uint8_t Bits = 16;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -364,6 +374,7 @@ class PixelColor<PixelFormat::ARGB1555>
 public:
 	using Type = uint16_t;
 	static constexpr uint8_t Depth = 15;
+	static constexpr uint8_t Bits = 16;
 
 	explicit constexpr
 	PixelColor(const Type value) :
