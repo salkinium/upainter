@@ -60,61 +60,6 @@ bitsPerPixel(PixelFormat format)
 			return 32;
 	}
 }
-
-static inline constexpr uint8_t
-bitsPerPixelCT(PixelFormat format)
-{
-	return  (format == PixelFormat::L1 ? 1 :
-			(format == PixelFormat::L2 ? 2 :
-			(format == PixelFormat::L4 ? 4 :
-			((format == PixelFormat::L8) or
-			 (format == PixelFormat::RGB332) or
-			 (format == PixelFormat::RGB1) or
-			 (format == PixelFormat::ARGB2) or
-			 (format == PixelFormat::Palette) ? 8 :
-			((format == PixelFormat::ARGB4) or
-			 (format == PixelFormat::ARGB1555) or
-			 (format == PixelFormat::RGB565) ? 16 :
-			32)))));
-}
-
-inline QImage::Format
-toQImageFormat(PixelFormat format)
-{
-	switch(format)
-	{
-		case PixelFormat::L1:
-			return QImage::Format_MonoLSB;
-
-//		case PixelFormat::L8:	// only with Qt 5.5!
-//			return QImage::Format_Grayscale8;
-
-		case PixelFormat::ARGB2:
-		case PixelFormat::RGB332:
-		case PixelFormat::RGB1:
-		case PixelFormat::L8:
-			return QImage::Format_Indexed8;
-
-		case PixelFormat::ARGB4:
-			return QImage::Format_ARGB4444_Premultiplied;
-
-		case PixelFormat::ARGB1555:
-			return QImage::Format_RGB555;
-
-		case PixelFormat::RGB565:
-			return QImage::Format_RGB16;
-
-		case PixelFormat::RGB8:
-			return QImage::Format_RGBX8888;
-
-		case PixelFormat::ARGB8:
-			return QImage::Format_RGBA8888;
-
-		default:
-			return QImage::Format_Invalid;
-	}
-}
-
 } // namespace ges
 
 } // namespace modm

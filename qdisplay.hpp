@@ -2,6 +2,7 @@
 #define MODM_GES_QDEVICE_HPP
 
 #include <QGraphicsView>
+#include <QImage>
 #include "pixel_buffer.hpp"
 #include "surface.hpp"
 
