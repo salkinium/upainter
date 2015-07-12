@@ -62,6 +62,18 @@ Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
 
 <img src="test/l8.png" width="100%">
 
+### 4bpp Grayscale
+
+4bits per pixel.
+
+<img src="test/l4.png" width="100%">
+
+### 2bpp Grayscale
+
+2bits per pixel. Hm, maybe not.
+
+<img src="test/l2.png" width="100%">
+
 ### 1bpp Grayscale
 
 Lolnope. Needs dithering. NOW!
