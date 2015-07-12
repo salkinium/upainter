@@ -3,12 +3,15 @@
 #	error	"Don't include this file directly, use 'surface.hpp' instead!"
 #endif
 
+#include <xpcc/architecture/detect.hpp>
+
 namespace modm
 {
 
 namespace ges
 {
 
+#ifndef XPCC__OS_HOSTED
 template<>
 class Surface<PixelFormat::L4>
 {
@@ -94,6 +97,7 @@ protected:
 	const uint16_t height;
 	uint8_t *const buffer;
 };
+#endif
 
 } // namespace ges
 

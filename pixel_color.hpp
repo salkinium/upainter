@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "color.hpp"
 #include "pixel_format.hpp"
+#include <xpcc/architecture/detect.hpp>
 
 namespace modm
 {
@@ -82,12 +83,56 @@ private:
 };
 
 template<>
+class PixelColor<PixelFormat::L2>
+{
+public:
+	using Type = uint8_t;
+	static constexpr uint8_t Depth = 2;
+#ifdef XPCC__OS_HOSTED
+	static constexpr uint8_t Bits = 8;
+#else
+	static constexpr uint8_t Bits = 2;
+#endif
+
+
+	explicit constexpr
+	PixelColor(const Type value) :
+		value(value & 0x03) {}
+
+	constexpr
+	PixelColor(const Color color) :
+		value(uint8_t(color.getRed()   * 0.2125 +
+					  color.getGreen() * 0.7154 +
+					  color.getBlue()  * 0.0721 ) >> 6) {}
+
+	constexpr Type
+	getValue() const
+	{ return value; }
+
+	explicit constexpr
+	operator Color() const
+	{ return Color(0xff000000 | value * 0x555555); }
+
+	constexpr bool
+	operator== (const PixelColor<PixelFormat::L2> &other) const
+	{ return value == other.value; }
+
+private:
+	Type value;
+};
+
+template<>
 class PixelColor<PixelFormat::L4>
 {
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 4;
+#ifdef XPCC__OS_HOSTED
+	static constexpr uint8_t Bits = 8;
+#else
 	static constexpr uint8_t Bits = 4;
+#endif
+
 
 	explicit constexpr
 	PixelColor(const Type value) :

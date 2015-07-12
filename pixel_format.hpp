@@ -2,7 +2,7 @@
 #define MODM_GES_PIXELFORMAT_HPP
 
 #include <stdint.h>
-#include <QImage>
+#include <xpcc/architecture/detect.hpp>
 
 namespace modm
 {
@@ -38,10 +38,14 @@ bitsPerPixel(PixelFormat format)
 			return 1;
 
 		case PixelFormat::L2:
+#ifndef XPCC__OS_HOSTED
 			return 2;
+#endif
 
 		case PixelFormat::L4:
+#ifndef XPCC__OS_HOSTED
 			return 4;
+#endif
 
 		case PixelFormat::L8:
 		case PixelFormat::RGB332:
