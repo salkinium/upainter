@@ -28,6 +28,10 @@ public:
 		width(width), height(height), buffer(buffer)
 	{}
 
+	Surface(uint8_t *const buffer, const Size size) :
+		Surface(buffer, size.getWidth(), size.getHeight())
+	{}
+
 	template< uint16_t Width, uint16_t Height >
 	Surface(PixelBuffer<Width, Height, Format> &buffer) :
 		Surface(buffer.getData(), Width, Height)
@@ -40,6 +44,10 @@ public:
 	uint16_t
 	getHeight() const
 	{ return height; }
+
+	Size
+	getSize() const
+	{ return Size(width, height); }
 
 	static constexpr PixelFormat
 	getPixelFormat()
@@ -57,25 +65,32 @@ public:
 		std::memset(buffer, color.getValue() * 0x11, std::size_t(width) * height / 2);
 	}
 
-	bool
+	void
 	setPixel(uint16_t x, uint16_t y, NativeColor color)
 	{
-		if (x < width and y < height)
-		{
-			if (x & 0x01) {
-				buffer[(y * width + x) / 2] = (buffer[(y * width + x) / 2] & ~0xf0) | (color.getValue() << 4);
-			} else {
-				buffer[(y * width + x) / 2] = (buffer[(y * width + x) / 2] & ~0x0f) | color.getValue();
-			}
-			return true;
+		if (x & 0x01) {
+			buffer[(y * width + x) / 2] = (buffer[(y * width + x) / 2] & ~0xf0) | (color.getValue() << 4);
+		} else {
+			buffer[(y * width + x) / 2] = (buffer[(y * width + x) / 2] & ~0x0f) | color.getValue();
 		}
-		return false;
 	}
 
-	bool
+	inline void
+	setPixel(Point p, NativeColor color)
+	{
+		setPixel(p.getX(), p.getY(), color);
+	}
+
+	void
 	clearPixel(uint16_t x, uint16_t y)
 	{
-		return setPixel(x, y, NativeColor(0));
+		setPixel(x, y, NativeColor(0));
+	}
+
+	inline void
+	clearPixel(Point p)
+	{
+		setPixel(p.getX(), p.getY(), NativeColor(0));
 	}
 
 	NativeColor
@@ -90,6 +105,12 @@ public:
 			}
 		}
 		return NativeColor(0);
+	}
+
+	NativeColor
+	getPixel(Point p) const
+	{
+		return getPixel(p.getX(), p.getY());
 	}
 
 protected:
