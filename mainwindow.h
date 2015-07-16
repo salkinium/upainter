@@ -5,6 +5,7 @@
 #include "surface.hpp"
 #include "qdisplay.hpp"
 #include <QTimer>
+#include "painter.hpp"
 
 using namespace modm::ges;
 
@@ -14,7 +15,7 @@ class MainWindow;
 
 static uint8_t staticBuffer[128*64*4];
 
-typedef Surface<PixelFormat::ARGB1555> FormattedSurface;
+static constexpr PixelFormat Format = PixelFormat::ARGB4;
 
 class MainWindow : public QMainWindow
 {
@@ -26,11 +27,10 @@ public:
 
 private:
 	Ui::MainWindow *ui;
-	float scale;
-	float currentStepScaleFactor;
 	QTimer timer;
-	FormattedSurface surface;
-	FormattedSurface::Buffer<128, 64> buffer;
+	Surface<Format> surface;
+	Surface<Format>::Buffer<128, 64> buffer;
+	Painter<Format> painter;
 	QDisplay qDisplay;
 	qreal offset;
 };

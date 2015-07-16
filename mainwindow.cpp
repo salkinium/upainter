@@ -8,11 +8,18 @@
 #include <QTimer>
 #include <QHBoxLayout>
 
+modm::ges::Color
+fromQColor(qreal h, qreal s, qreal l, qreal a = 1.0)
+{
+	QColor qcolor = QColor::fromHslF(h, s, l, a);
+	return Color(qcolor.red(), qcolor.green(), qcolor.blue(), qcolor.alpha());
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
-	scale(10), currentStepScaleFactor(1),
-	surface(buffer),
+	surface(buffer), painter(surface),
 	qDisplay(surface), offset(0)
 {
 	ui->setupUi(this);
@@ -29,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		offset += 0.0007135;
 		if (offset > 1) offset -= 1;
 
+		//*
 		for (int ww = 0; ww < surface.getWidth(); ww++)
 		{
 			for (int hh = 0; hh < surface.getHeight(); hh++)
@@ -36,11 +44,27 @@ MainWindow::MainWindow(QWidget *parent) :
 				qreal l = 1 - hh / qreal(surface.getHeight());
 				qreal h = (ww / qreal(surface.getWidth()) + offset);
 				if (h > 1) h -= 1;
-				QColor qcolor = QColor::fromHslF(h, 1, l);
-				Color color(qcolor.red(), qcolor.green(), qcolor.blue());
+				Color color = fromQColor(h, 1, l);
 				surface.setPixel(ww, hh, color);
 			}
 		}
+		//*/
+
+		qreal r = offset * 10;
+		static float l = 10;
+
+		Rect clip = Rect(40 + int(-l/2) % 100, 20 +int(-l/4)%50, 60, 40);
+
+		painter.fillRect(clip, Color::White);
+		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
+		painter.drawRect(outline, fromQColor(offset, 1, 0.5));
+		l += 0.2;
+
+		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
+
+		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red,
+							 clip);
+
 		this->repaint();
 	});
 	timer.start(33);

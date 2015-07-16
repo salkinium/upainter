@@ -26,19 +26,23 @@ INCLUDEPATH += "$$PWD/xpcc/src"
 LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
 SOURCES += main.cpp\
-	mainwindow.cpp \
-	color.cpp \
-	qdisplay.cpp
+    mainwindow.cpp \
+    color.cpp \
+    qdisplay.cpp
 
 HEADERS  += mainwindow.h \
-	    surface.hpp \
-	    pixel_format.hpp \
-	    color.hpp \
-	    surface/surface_l1.hpp \
-	    surface/surface_l4.hpp \
-	    pixel_buffer.hpp \
-	    accelerator.hpp \
-	    qdisplay.hpp \
-    pixel_color.hpp
+    surface.hpp \
+    pixel_format.hpp \
+    color.hpp \
+    surface/surface_l1.hpp \
+    surface/surface_l4.hpp \
+    pixel_buffer.hpp \
+    qdisplay.hpp \
+    pixel_color.hpp \
+    geometry/point.hpp \
+    geometry/size.hpp \
+    geometry/line.hpp \
+    geometry/rect.hpp \
+    painter.hpp
 
 FORMS    += mainwindow.ui
