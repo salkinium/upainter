@@ -117,6 +117,9 @@ protected:
 	const uint16_t width;
 	const uint16_t height;
 	uint8_t *const buffer;
+
+	template < PixelFormat F >
+	friend class Painter;
 };
 #endif
 

@@ -126,6 +126,9 @@ protected:
 	const uint16_t width;
 	const uint16_t height;
 	BufferType *const buffer;
+
+	template < PixelFormat F >
+	friend class Painter;
 };
 
 } // namespace ges
