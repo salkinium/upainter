@@ -4,9 +4,9 @@
 #include <cstddef>
 #include <stdint.h>
 #include <xpcc/architecture/utils.hpp>
-#include <cstring>
 #include "pixel_format.hpp"
 #include "pixel_color.hpp"
+#include "geometry/rect.hpp"
 
 namespace modm
 {
@@ -31,6 +31,26 @@ public:
 	inline uint8_t *
 	getData()
 	{ return data; }
+
+	static Size
+	getSize()
+	{ return Size(Width, Height); }
+
+	static Rect
+	getBounds()
+	{ return Rect(0,0, Width, Height); }
+
+	static constexpr uint16_t
+	getWidth()
+	{ return Width; }
+
+	static constexpr uint16_t
+	getHeight()
+	{ return Height; }
+
+	static constexpr PixelFormat
+	getPixelFormat()
+	{ return Format; }
 
 	static constexpr std::size_t
 	getLength()
