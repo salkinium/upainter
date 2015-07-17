@@ -31,11 +31,12 @@ public:
 	drawLine(const Line &l, NativeColor c, Rect clip = Rect())
 	{
 		clip = surface.clip(clip);
+		const Line ln = l.normalized();
 
-		int16_t bX = l.getX1();
-		int16_t bY = l.getY1();
-		int16_t eX = l.getX2();
-		int16_t eY = l.getY2();
+		int16_t bX = ln.getX1();
+		int16_t bY = ln.getY1();
+		int16_t eX = ln.getX2();
+		int16_t eY = ln.getY2();
 
 		// check if line is vertical
 		if (bX == eX)
@@ -73,37 +74,198 @@ public:
 			return;
 		}
 
+		/*
 		{
-			int16_t dx =  abs(eX-bX);
-			int8_t sx = bX < eX ? 1 : -1;
+			// classic bresenham without any clipping during setup
+			const int16_t dx =  abs(eX-bX);
+			const int16_t dy = -abs(eY-bY);
 
-			int16_t dy = -abs(eY-bY);
-			int8_t sy = bY < eY ? 1 : -1;
+			const int8_t sy = bY < eY ? 1 : -1;
 
 			// error value e_xy
 			int32_t err = dx + dy;
 			int32_t e2;
 
-			for (;;)
+			while (true)
 			{
 				// this should be solved with analytic line clipping, not bit masking
 				if (clip.contains(bX, bY)) surface.setPixel(bX, bY, c);
 
+				if (bX == eX and bY == eY) break;
+
 				e2 = 2*err;
-				if (e2 >= dy) // e_xy + e_x > 0
+				if (e2 > dy) // e_xy + e_x > 0
 				{
-					if (bX == eX) break;
 					err += dy;
-					bX += sx;
+					bX++;
 				}
-				if (e2 <= dx) // e_xy + e_y < 0
+				if (e2 < dx) // e_xy + e_y < 0
 				{
-					if (bY == eY) break;
 					err += dx;
 					bY += sy;
 				}
 			}
 		}
+		/*/
+		{
+			// code below is based directly on the paper:
+			// Yevgeny P. Kuzmin. Bresenham's Line Generation Algorithm with
+			// Built-in Clipping. Computer Graphics Forum, 14(5):275--280, 2005.
+
+			int16_t wbX = clip.getLeft();
+			int16_t wbY = clip.getTop();
+			int16_t weX = clip.getRight();
+			int16_t weY = clip.getBottom();
+
+			int16_t xd;
+			int16_t yd;
+			int16_t* d0 = &xd;
+			int16_t* d1 = &yd;
+
+
+			// is line even visible?
+			if (bX > weX or eX < wbX) return;
+
+			int8_t stx = 1;
+			int8_t sty = 1;
+
+			// check if points are in Y order <
+			if (bY < eY)
+			{
+				// is line even visible?
+				if (bY > weY or eY < wbY) return;
+				//sty = 1;	// line goes down (y-axis does down, remember?)
+			}
+			else
+			{
+				// is line even visible?
+				if (eY > weY or bY < wbY) return;
+				sty = -1;	// line goes up (y-axis does down, remember?)
+
+				// invert signs
+				bY = -bY; eY = -eY;
+				wbY = -wbY; weY = -weY;
+				std::swap(wbY, weY);
+			}
+
+			// compute absolute x and y deltas
+			uint16_t dsx = eX - bX;
+			uint16_t dsy = eY - bY;
+
+			// if line is steep, i.e. more y steps than x steps like /
+			if (dsx < dsy)
+			{
+				// use y and x
+				d0 = &yd; d1 = &xd;
+
+				// mirror everything on the first quadrant axis
+				std::swap(bX,bY);   std::swap(eX,eY);
+				std::swap(wbX,wbY); std::swap(weX,weY);
+				std::swap(dsx,dsy); std::swap(stx,sty);
+			}
+			//else {	// already done at beginning!
+				// use x and y
+			//	d0 = &xd; d1 = &yd;
+			//}
+
+			// clipping
+			uint_fast16_t dx2 = 2 * dsx;
+			const uint_fast16_t dy2 = 2 * dsy;
+			xd = bX;
+			yd = bY;
+
+			int32_t e = dy2 - dsx;
+			bool setexit = false;
+
+			// line starts above the clip window
+			if (bY < wbY)
+			{
+				//uint32_t temp = dx2 * (wbY - bY) - dsx;
+				uint32_t temp = (2 * (wbY - bY) - 1) * dsx;
+				uint_fast16_t msd = temp / dy2;
+				xd += msd;
+
+				// line misses the clip window entirely
+				if (xd > weX) return;
+
+				// line starts
+				if (xd >= wbX)
+				{
+					uint16_t rem = temp - msd * dy2;
+
+					yd = wbY;
+					e -= rem + dsx;
+
+					if (rem > 0)
+					{
+						xd++;
+						e += dy2;
+					}
+					setexit = true;
+				}
+			}
+
+			if (not setexit and bX < wbX)
+			{
+				uint32_t temp = dy2 * (wbX - bX);
+				uint_fast16_t msd = temp / dx2;
+				yd += msd;
+				uint16_t rem = temp % dx2;
+
+				if (yd > weY or (yd == weY and rem >= dsx)) return;
+
+				xd = wbX;
+				e += rem;
+
+				if (rem >= dsx)
+				{
+					yd++;
+					e -= dx2;
+				}
+			}
+
+			int16_t term = eX;
+			if (eY > weY)
+			{
+				uint32_t temp = dx2 * (weY - bY) + dsx;
+				uint_fast16_t msd = temp / dy2;
+				term = bX + msd;
+
+				if ((temp - msd * dy2) == 0) term--;
+			}
+
+			if (term > weX) term = weX;
+			term++;
+
+			if (sty == -1) yd = -yd;
+
+			if (stx == -1) {
+				xd = -xd;
+				term = -term;
+			}
+			dx2 -= dy2;
+
+			// bresenham line drawing
+			while (xd != term)
+			{
+				// if you get a crash here, check your bX,bY,eX,eY coordinates to see
+				// they are in a reasonable range -- it could cause integer overflow
+				// in this function
+				surface.setPixel(*d0, *d1, c);
+
+				if (e >= 0)
+				{
+					yd += sty;
+					e -= dx2;
+				}
+				else {
+					e += dy2;
+				}
+
+				xd += stx;
+			}
+		}
+		//*/
 	}
 
 	void
