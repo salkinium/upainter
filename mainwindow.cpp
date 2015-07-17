@@ -57,13 +57,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 		painter.fillRect(clip, Color::White);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
-		painter.drawRect(outline, fromQColor(offset, 1, 0.5));
+		painter.drawRect(outline, fromQColor(offset, 1, 0.5), Rect(20, 10, 127-40, 63-20));
 		l += 0.2;
 
 		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
 
-		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red,
-							 clip);
+		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red, clip);
+
+		painter.drawLine(Line(40 + int(l)%30, 32-128*cos(r), 40 + int(l)%30, 32+128*cos(r)), Color::Yellow, clip);
+		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
 
 		this->repaint();
 	});

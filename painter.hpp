@@ -21,7 +21,10 @@ class Painter
 {
 	typedef typename Surface<Format>::NativeColor NativeColor;
 public:
-	Painter(Surface<Format> &surface) :
+	typedef Surface<Format> Surface;
+
+
+	Painter(Surface &surface) :
 		surface(surface) {}
 
 	void
@@ -34,33 +37,71 @@ public:
 		int16_t eX = l.getX2();
 		int16_t eY = l.getY2();
 
-		int16_t dx =  abs(eX-bX);
-		int8_t sx = bX < eX ? 1 : -1;
-
-		int16_t dy = -abs(eY-bY);
-		int8_t sy = bY < eY ? 1 : -1;
-
-		// error value e_xy
-		int32_t err = dx + dy;
-		int32_t e2;
-
-		for (;;)
+		// check if line is vertical
+		if (bX == eX)
 		{
-			// this should be solved with analytic line clipping, not bit masking
-			if (clip.contains(bX, bY)) surface.setPixel(bX, bY, c);
+			// check if line is vertically within clipping
+			if (bX < clip.getLeft() or bX > clip.getRight()) return;
+			// order correctly
+			if (eY < bY) std::swap(bY, eY);
+			// check if line is horizintally within clipping
+			if (eY < clip.getTop() or bY > clip.getBottom()) return;
 
-			e2 = 2*err;
-			if (e2 >= dy) // e_xy + e_x > 0
+			// clip vertical length
+			bY = xpcc::max(bY, clip.getTop());
+			eY = xpcc::min(eY, clip.getBottom());
+			// draw visible and clipped line
+			drawVerticalLine(c, bX, bY, eY);
+			return;
+		}
+
+		// check if line is horizontal
+		if (bY == eY)
+		{
+			// check if line is horizontally within clipping
+			if (bY < clip.getTop() or bY > clip.getBottom()) return;
+			// order correctly
+			if (eX < bX) std::swap(bX, eX);
+			// check if line is vertically within clipping
+			if (eX < clip.getLeft() or bX > clip.getRight()) return;
+
+			// clip horizontal length
+			bX = xpcc::max(bX, clip.getLeft());
+			eX = xpcc::min(eX, clip.getRight());
+			// draw visible and clipped line
+			drawHorizontalLine(c, bY, bX, eX);
+			return;
+		}
+
+		{
+			int16_t dx =  abs(eX-bX);
+			int8_t sx = bX < eX ? 1 : -1;
+
+			int16_t dy = -abs(eY-bY);
+			int8_t sy = bY < eY ? 1 : -1;
+
+			// error value e_xy
+			int32_t err = dx + dy;
+			int32_t e2;
+
+			for (;;)
 			{
-				if (bX == eX) break;
-				err += dy;
-				bX += sx;
-			}
-			if (e2 <= dx) // e_xy + e_y < 0
-			{
-				if (bY == eY) break;
-				err += dx;
-				bY += sy;
+				// this should be solved with analytic line clipping, not bit masking
+				if (clip.contains(bX, bY)) surface.setPixel(bX, bY, c);
+
+				e2 = 2*err;
+				if (e2 >= dy) // e_xy + e_x > 0
+				{
+					if (bX == eX) break;
+					err += dy;
+					bX += sx;
+				}
+				if (e2 <= dx) // e_xy + e_y < 0
+				{
+					if (bY == eY) break;
+					err += dx;
+					bY += sy;
+				}
 			}
 		}
 	}
@@ -140,7 +181,7 @@ protected:
 	}
 
 private:
-	Surface<Format> &surface;
+	Surface &surface;
 };
 
 } // namespace ges
