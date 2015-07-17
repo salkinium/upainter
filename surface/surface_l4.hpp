@@ -49,9 +49,20 @@ public:
 	getSize() const
 	{ return Size(width, height); }
 
+	Rect
+	getBounds() const
+	{ return Rect(0,0, width-1, height-1); }
+
 	static constexpr PixelFormat
 	getPixelFormat()
 	{ return Format; }
+
+	Rect
+	clip(Rect input = Rect()) const
+	{
+		if (input.isEmpty()) return getBounds();
+		return input.intersected(getBounds());
+	}
 
 	void
 	clear()

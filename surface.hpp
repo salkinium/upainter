@@ -56,20 +56,18 @@ public:
 
 	Rect
 	getBounds() const
-	{
-		return Rect(0,0, width-1, height-1);
-	}
-
-	Rect
-	clip(Rect input = Rect()) const
-	{
-		if (input.isEmpty()) return Rect(0,0, width-1, height-1);
-		return input.intersected(getBounds());
-	}
+	{ return Rect(0,0, width-1, height-1); }
 
 	static constexpr PixelFormat
 	getPixelFormat()
 	{ return Format; }
+
+	Rect
+	clip(Rect input = Rect()) const
+	{
+		if (input.isEmpty()) return getBounds();
+		return input.intersected(getBounds());
+	}
 
 	void
 	clear()
