@@ -34,6 +34,11 @@ public:
 		p1(l.p1), p2(l.p2) {}
 
 
+	inline Rect
+	getBounds() const
+	{ return Rect(Point(p1), Point(p2)); }
+
+
 	inline int16_t
 	getDx() const
 	{ return (p2.getX() - p1.getX()); }

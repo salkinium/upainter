@@ -43,6 +43,7 @@ HEADERS  += mainwindow.h \
     geometry/size.hpp \
     geometry/line.hpp \
     geometry/rect.hpp \
-    painter.hpp
+    painter.hpp \
+    geometry/circle.hpp
 
 FORMS    += mainwindow.ui
