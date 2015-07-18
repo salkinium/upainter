@@ -9,6 +9,7 @@
 #include "geometry/line.hpp"
 #include "geometry/line.hpp"
 #include "geometry/rect.hpp"
+#include "geometry/circle.hpp"
 
 namespace modm
 {
@@ -205,6 +206,7 @@ public:
 				}
 			}
 
+			// line starts left of the clip window
 			if (not setexit and bX < wbX)
 			{
 				uint32_t temp = dy2 * (wbX - bX);
@@ -212,6 +214,7 @@ public:
 				yd += msd;
 				uint16_t rem = temp % dx2;
 
+				// line misses clip window entirely
 				if (yd > weY or (yd == weY and rem >= dsx)) return;
 
 				xd = wbX;
@@ -266,6 +269,55 @@ public:
 			}
 		}
 		//*/
+	}
+
+	void drawCircle(const Circle &ci, NativeColor c, Rect clip = Rect())
+	{
+		// we don't draw empty circles
+		if (ci.isEmpty()) return;
+
+		// clip the clipping to the surface
+		clip = surface.clip(clip);
+
+		// only draw intersecting circles
+		if (not ci.intersects(clip)) return;
+
+		// start the drawing
+		int16_t r = ci.getRadius();
+		int16_t x = -r;
+		int16_t y = 0;
+		int16_t err = 2 - 2 * r;
+
+		do {
+			/* clipping circles seems difficult, because:
+			 *  1. the clipping rect can create 4 arcs that need to be drawn
+			 *  2. we need to be able to draw arbitrary arcs with bresenham
+			 *
+			 * Typical clipping strategies subdivide the circle into its 8 octants and
+			 * then only render those that are (partially) visible.
+			 * The individual octants are clipped using guard band clipping.
+			 *
+			 * I haven't found a good arc rasterization algorithm based on this one yet,
+			 * so this uses the cheesy guard band clipping way for every pixel.
+			 */
+			if (clip.contains(ci.getX() - x, ci.getY() + y))
+				surface.setPixel(ci.getX() - x, ci.getY() + y, c);	//   I. Quadrant +x +y
+			if (clip.contains(ci.getX() - y, ci.getY() - x))
+				surface.setPixel(ci.getX() - y, ci.getY() - x, c);	//  II. Quadrant -x +y
+			if (clip.contains(ci.getX() + x, ci.getY() - y))
+				surface.setPixel(ci.getX() + x, ci.getY() - y, c);	// III. Quadrant -x -y
+			if (clip.contains(ci.getX() + y, ci.getY() + x))
+				surface.setPixel(ci.getX() + y, ci.getY() + x, c);	//  IV. Quadrant +x -y
+
+			r = err;
+
+			if (r <= y) err += ++y * 2 + 1;		// e_xy+e_y < 0
+
+			if (r > x or err > y) {			// e_xy+e_x > 0 or no 2nd y-step
+				err += ++x * 2 + 1;				// -> x-step now
+			}
+		}
+		while (x < 0);
 	}
 
 	void
