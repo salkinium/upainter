@@ -28,7 +28,7 @@ public:
 
 	inline bool
 	isEmpty() const
-	{ return radius <= 0; }
+	{ return radius < 0; }
 
 	inline bool
 	isNull() const
@@ -109,15 +109,50 @@ public:
 	// contains
 	inline bool
 	contains(const Point &point) const
-	{ return origin.distanceSquared(point) <= uint16_t(radius * radius); }
+	{ return origin.distanceSquared(point) <= (int32_t(radius) * radius); }
 
 	inline bool
 	contains(int16_t x, int16_t y) const
+	{ return contains(Point(x, y)); }
+
+	inline bool
+	contains(const Line &l) const
+	{ return contains(l.getP1()) and contains(l.getP2()); }
+
+	inline bool
+	contains(const Rect &r) const
 	{
-		return contains(Point(x, y));
+		return	contains(r.getTopLeft()) and contains(r.getTopRight()) and
+				contains(r.getBottomLeft()) and contains(r.getBottomRight());
 	}
 
+
 	// intersections
+	inline bool
+	intersects(const Circle &c) const
+	{
+		int16_t r = radius + c.radius;
+		return (origin.distanceSquared(c.origin) <= uint16_t(r * r));
+		// well... that was simple.
+	}
+
+	inline bool
+	intersects(const Line &l) const
+	{
+		// http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
+		int32_t a = l.getX2() - l.getX1();
+		int32_t b = l.getY1() - l.getY2();
+		int32_t c = (-a) * l.getY1() + (-b) * l.getX1();
+
+		int32_t d = a * origin.getX() + b * origin.getY() + c;
+		d *= d;	// square it, now definitely positive
+
+		int32_t r = radius;
+		r *= a * a + b * b;
+
+		return d <= r;
+	}
+
 	inline bool
 	intersects(const Rect &r) const
 	{
@@ -168,6 +203,11 @@ public:
 		}
 		return true;
 	}
+
+	inline bool operator == (const Circle &rhs) const
+	{ return (origin == rhs.origin and radius == rhs.radius); }
+	inline bool operator != (const Circle &rhs) const
+	{ return (origin != rhs.origin or radius != rhs.radius); }
 
 private:
 	Point origin;
