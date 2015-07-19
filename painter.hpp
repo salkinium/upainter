@@ -320,6 +320,45 @@ public:
 		while (x < 0);
 	}
 
+	void fillCircle(const Circle &ci, NativeColor c, Rect clip = Rect())
+	{
+		// we don't draw empty circles
+		if (ci.isEmpty()) return;
+
+		// clip the clipping to the surface
+		clip = surface.clip(clip);
+
+		// only draw intersecting circles
+		if (not ci.intersects(clip)) return;
+		if (ci.isNull()) {
+			surface.setPixel(ci.getOrigin(), c);
+			return;
+		}
+
+		// start the drawing
+		int16_t r = ci.getRadius();
+		int16_t x = -r;
+		int16_t y = 0;
+		int16_t err = 2 - 2 * r;
+
+		do {
+
+			// above origin, left to right
+			drawHorizontalLineClipped(c, ci.getY() + y, ci.getX() + x, ci.getX() - x, clip);
+			// below left to right
+			drawHorizontalLineClipped(c, ci.getY() - y, ci.getX() + x, ci.getX() - x, clip);
+
+			r = err;
+
+			if (r <= y) err += ++y * 2 + 1;		// e_xy+e_y < 0
+
+			if (r > x or err > y) {			// e_xy+e_x > 0 or no 2nd y-step
+				err += ++x * 2 + 1;				// -> x-step now
+			}
+		}
+		while (x < 0);
+	}
+
 	void
 	drawRect(const Rect &r, NativeColor c, Rect clip = Rect())
 	{
@@ -374,6 +413,23 @@ public:
 	}
 
 protected:
+
+	void
+	drawHorizontalLineClipped(NativeColor c, int16_t y, int16_t beginX, int16_t endX, const Rect &clip)
+	{
+		if (y >= clip.getTop() and y <= clip.getBottom())
+		{
+			// Y is in clip window
+			int16_t cR = clip.getRight();
+			if (beginX <= cR)
+			{
+				// line starts before right of clip window
+				drawHorizontalLine(c, y, std::max(beginX, clip.getLeft()), std::min(endX, cR));
+			}
+		}
+	}
+
+
 	void
 	drawHorizontalLine(NativeColor color, int16_t y,
 					   int16_t beginX, int16_t endX)
