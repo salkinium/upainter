@@ -87,22 +87,22 @@ public:
 		buffer[y * width + x] = color.getValue();
 	}
 
-	inline bool
+	inline void
 	setPixel(Point p, NativeColor color)
 	{
-		return setPixel(p.getX(), p.getY(), color);
+		setPixel(p.getX(), p.getY(), color);
 	}
 
-	inline bool
+	inline void
 	clearPixel(uint16_t x, uint16_t y)
 	{
-		return setPixel(x, y, NativeColor(0));
+		setPixel(x, y, NativeColor(0));
 	}
 
-	inline bool
+	inline void
 	clearPixel(Point p)
 	{
-		return setPixel(p, NativeColor(0));
+		setPixel(p, NativeColor(0));
 	}
 
 	NativeColor
