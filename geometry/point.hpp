@@ -77,12 +77,12 @@ public:
 		return Point::distance(*this, point);
 	}
 
-	static inline uint16_t
+	static inline uint32_t
 	distanceSquared(const Point &point1, const Point &point2)
 	{
 		// not using `xpcc::Vector::getLengthSquared()` to avoid float type
 		Point d = point2 - point1;
-		return (d.getX() * d.getX() + d.getY() * d.getY());
+		return (int32_t(d.getX()) * d.getX() + int32_t(d.getY()) * d.getY());
 	}
 
 	inline uint16_t

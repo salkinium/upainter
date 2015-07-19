@@ -47,6 +47,10 @@ public:
 	getDy() const
 	{ return (p2.getY() - p1.getY()); }
 
+	inline Point
+	getDelta() const
+	{ return (p2 - p1); }
+
 
 	inline Point
 	getP1() const
@@ -90,6 +94,15 @@ public:
 	inline void
 	setLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 	{ p1.set(x1, y1); p2.set(x2, y2); }
+
+
+	inline float
+	getLength() const
+	{ return Point(p1).distance(p2); }
+
+	inline uint32_t
+	getLengthSquared() const
+	{ return Point(p1).distanceSquared(p2); }
 
 
 	inline void
