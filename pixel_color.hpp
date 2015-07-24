@@ -43,6 +43,66 @@ public:
 	operator== (const PixelColor<PixelFormat::ARGB8> &other) const
 	{ return value == other.value; }
 
+
+	void
+	Clear(const PixelColor<PixelFormat::ARGB8> &)
+	{ value = 0; }
+
+
+	void
+	A(const PixelColor<PixelFormat::ARGB8> &a)
+	{ value = a.value; }
+
+	void
+	B(const PixelColor<PixelFormat::ARGB8> &)
+	{ }
+
+
+	void
+	AoverB(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->AoverB(reinterpret_cast<const Color&>(b)); }
+
+	void
+	BoverA(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->BoverA(reinterpret_cast<const Color&>(b)); }
+
+
+	void
+	AinB(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->AinB(reinterpret_cast<const Color&>(b)); }
+
+	void
+	BinA(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->BinA(reinterpret_cast<const Color&>(b)); }
+
+
+	void
+	AoutB(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->AoutB(reinterpret_cast<const Color&>(b)); }
+
+	void
+	BoutA(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->BoutA(reinterpret_cast<const Color&>(b)); }
+
+
+	void
+	AatopB(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->AatopB(reinterpret_cast<const Color&>(b)); }
+
+	void
+	BatopA(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->BatopA(reinterpret_cast<const Color&>(b)); }
+
+
+	void
+	Xor(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->Xor(reinterpret_cast<const Color&>(b)); }
+
+
+	void
+	Plus(const PixelColor<PixelFormat::ARGB8> &b)
+	{ reinterpret_cast<Color*>(this)->Plus(reinterpret_cast<const Color&>(b)); }
+
 private:
 	Type value;
 };

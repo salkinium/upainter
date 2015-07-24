@@ -21,16 +21,38 @@ template< PixelFormat Format >
 class Painter
 {
 	typedef typename Surface<Format>::NativeColor NativeColor;
+	typedef void (NativeColor::*CompositionFunction)(const NativeColor&);
 public:
 	typedef Surface<Format> Surface;
+
+	static constexpr CompositionFunction Clear = &NativeColor::Clear;
+
+	static constexpr CompositionFunction A = &NativeColor::A;
+	static constexpr CompositionFunction B = &NativeColor::B;
+
+	static constexpr CompositionFunction AoverB = &NativeColor::AoverB;
+	static constexpr CompositionFunction BoverA = &NativeColor::BoverA;
+
+	static constexpr CompositionFunction AinB = &NativeColor::AinB;
+	static constexpr CompositionFunction BinA = &NativeColor::BinA;
+
+	static constexpr CompositionFunction AoutB = &NativeColor::AoutB;
+	static constexpr CompositionFunction BoutA = &NativeColor::BoutA;
+
+	static constexpr CompositionFunction AatopB = &NativeColor::AatopB;
+	static constexpr CompositionFunction BatopA = &NativeColor::BatopA;
+
+	static constexpr CompositionFunction Xor = &NativeColor::Xor;
 
 
 	Painter(Surface &surface) :
 		surface(surface) {}
 
 	void
-	drawLine(const Line &l, NativeColor c, Rect clip = Rect())
+	drawLine(const Line &l, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
 	{
+		if (l.isNull()) return;
+
 		clip = surface.clip(clip);
 		const Line ln = l.normalized();
 
@@ -53,7 +75,7 @@ public:
 			bY = xpcc::max(bY, clip.getTop());
 			eY = xpcc::min(eY, clip.getBottom());
 			// draw visible and clipped line
-			drawVerticalLine(c, bX, bY, eY);
+			drawVerticalLine(c, op, bX, bY, eY);
 			return;
 		}
 
@@ -71,7 +93,7 @@ public:
 			bX = xpcc::max(bX, clip.getLeft());
 			eX = xpcc::min(eX, clip.getRight());
 			// draw visible and clipped line
-			drawHorizontalLine(c, bY, bX, eX);
+			drawHorizontalLine(c, op, bY, bX, eX);
 			return;
 		}
 
@@ -89,7 +111,7 @@ public:
 
 			while (true)
 			{
-				// this should be solved with analytic line clipping, not bit masking
+				// this is guard-band clipping
 				if (clip.contains(bX, bY)) surface.setPixel(bX, bY, c);
 
 				if (bX == eX and bY == eY) break;
@@ -254,7 +276,7 @@ public:
 				// if you get a crash here, check your bX,bY,eX,eY coordinates to see
 				// they are in a reasonable range -- it could cause integer overflow
 				// in this function
-				surface.setPixel(*d0, *d1, c);
+				compositePixel(*d0, *d1, c, op);
 
 				if (e >= 0)
 				{
@@ -271,7 +293,7 @@ public:
 		//*/
 	}
 
-	void drawCircle(const Circle &ci, NativeColor c, Rect clip = Rect())
+	void drawCircle(const Circle &ci, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
 	{
 		// we don't draw empty circles
 		if (ci.isEmpty()) return;
@@ -301,13 +323,13 @@ public:
 			 * so this uses the cheesy guard band clipping way for every pixel.
 			 */
 			if (clip.contains(ci.getX() - x, ci.getY() + y))
-				surface.setPixel(ci.getX() - x, ci.getY() + y, c);	//   I. Quadrant +x +y
+				compositePixel(ci.getX() - x, ci.getY() + y, c, op);	//   I. Quadrant +x +y
 			if (clip.contains(ci.getX() - y, ci.getY() - x))
-				surface.setPixel(ci.getX() - y, ci.getY() - x, c);	//  II. Quadrant -x +y
+				compositePixel(ci.getX() - y, ci.getY() - x, c, op);	//  II. Quadrant -x +y
 			if (clip.contains(ci.getX() + x, ci.getY() - y))
-				surface.setPixel(ci.getX() + x, ci.getY() - y, c);	// III. Quadrant -x -y
+				compositePixel(ci.getX() + x, ci.getY() - y, c, op);	// III. Quadrant -x -y
 			if (clip.contains(ci.getX() + y, ci.getY() + x))
-				surface.setPixel(ci.getX() + y, ci.getY() + x, c);	//  IV. Quadrant +x -y
+				compositePixel(ci.getX() + y, ci.getY() + x, c, op);	//  IV. Quadrant +x -y
 
 			r = err;
 
@@ -320,7 +342,7 @@ public:
 		while (x < 0);
 	}
 
-	void fillCircle(const Circle &ci, NativeColor c, Rect clip = Rect())
+	void fillCircle(const Circle &ci, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
 	{
 		// we don't draw empty circles
 		if (ci.isEmpty()) return;
@@ -338,21 +360,29 @@ public:
 		// start the drawing
 		int16_t r = ci.getRadius();
 		int16_t x = -r;
-		int16_t y = 0;
+		int16_t y = 1;
 		int16_t err = 2 - 2 * r;
+		int16_t prevY = 0;
 
-		do {
+		drawHorizontalLineClipped(c, op, ci.getY(), ci.getX() - r, ci.getX() + r, clip);
 
-			// above origin, left to right
-			drawHorizontalLineClipped(c, ci.getY() + y, ci.getX() + x, ci.getX() - x, clip);
-			// below left to right
-			drawHorizontalLineClipped(c, ci.getY() - y, ci.getX() + x, ci.getX() - x, clip);
+		do
+		{
+			if (y != prevY)
+			{
+				// above origin, left to right
+				drawHorizontalLineClipped(c, op, ci.getY() + y, ci.getX() + x, ci.getX() - x, clip);
+				// below left to right
+				drawHorizontalLineClipped(c, op, ci.getY() - y, ci.getX() + x, ci.getX() - x, clip);
+				prevY = y;
+			}
 
 			r = err;
 
-			if (r <= y) err += ++y * 2 + 1;		// e_xy+e_y < 0
+			if (r <= y) err += ++y * 2 + 1;		// e_xy + e_y < 0
 
-			if (r > x or err > y) {			// e_xy+e_x > 0 or no 2nd y-step
+			if (r > x or err > y)
+			{			// e_xy + e_x > 0 or no 2nd y-step
 				err += ++x * 2 + 1;				// -> x-step now
 			}
 		}
@@ -360,7 +390,7 @@ public:
 	}
 
 	void
-	drawRect(const Rect &r, NativeColor c, Rect clip = Rect())
+	drawRect(const Rect &r, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
 	{
 		clip = surface.clip(clip);
 		// don't even bother if rect is not in clip area
@@ -383,39 +413,39 @@ public:
 
 		if (clip.getTop() <= r.getTop()) {	// top line
 			mt = r.getTop();
-			drawHorizontalLine(c, r.getTop(), ml, mr);
+			drawHorizontalLine(c, op, r.getTop(), ml+1, mr-1);
 		}
 
 		if (rb <= cb) {	// bottom line
 			mb = rb;
-			drawHorizontalLine(c, rb, ml, mr);
+			drawHorizontalLine(c, op, rb, ml+1, mr-1);
 		}
 
 		if (clip.getLeft() <= r.getLeft()) {	// left line
-			drawVerticalLine(c, r.getLeft(), mt, mb);
+			drawVerticalLine(c, op, r.getLeft(), mt, mb);
 		}
 
 		if (rr <= cr) {	// right line
-			drawVerticalLine(c, rr, mt, mb);
+			drawVerticalLine(c, op, rr, mt, mb);
 		}
 	}
 
 	void
-	fillRect(const Rect &r, NativeColor c, Rect clip = Rect())
+	fillRect(const Rect &r, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
 	{
 		clip = r.intersected(surface.clip(clip));
 		// there is no need to test for isEmpty() !
 
 		for (int16_t yy = clip.getTop(); yy <= clip.getBottom(); yy++)
 		{
-			drawHorizontalLine(c, yy, clip.getLeft(), clip.getRight());
+			drawHorizontalLine(c, op, yy, clip.getLeft(), clip.getRight());
 		}
 	}
 
 protected:
 
 	void
-	drawHorizontalLineClipped(NativeColor c, int16_t y, int16_t beginX, int16_t endX, const Rect &clip)
+	drawHorizontalLineClipped(NativeColor c, CompositionFunction op, int16_t y, int16_t beginX, int16_t endX, const Rect &clip)
 	{
 		if (y >= clip.getTop() and y <= clip.getBottom())
 		{
@@ -424,30 +454,37 @@ protected:
 			if (beginX <= cR)
 			{
 				// line starts before right of clip window
-				drawHorizontalLine(c, y, std::max(beginX, clip.getLeft()), std::min(endX, cR));
+				drawHorizontalLine(c, op, y, std::max(beginX, clip.getLeft()), std::min(endX, cR));
 			}
 		}
 	}
 
 
 	void
-	drawHorizontalLine(NativeColor color, int16_t y,
-					   int16_t beginX, int16_t endX)
+	drawHorizontalLine(NativeColor color, CompositionFunction op,
+					   int16_t y, int16_t beginX, int16_t endX)
 	{
 		for (int16_t xx = beginX; xx <= endX; xx++)
 		{
-			surface.setPixel(xx, y, color);
+			compositePixel(xx, y, color, op);
 		}
 	}
 
 	void
-	drawVerticalLine(NativeColor color, int16_t x,
-					 int16_t beginY, int16_t endY)
+	drawVerticalLine(NativeColor color, CompositionFunction op,
+					 int16_t x, int16_t beginY, int16_t endY)
 	{
 		for (int16_t yy = beginY; yy <= endY; yy++)
 		{
-			surface.setPixel(x, yy, color);
+			compositePixel(x, yy, color, op);
 		}
+	}
+
+	void inline
+	compositePixel(int16_t x, int16_t y, const NativeColor &c, CompositionFunction op)
+	{
+		typedef void (NativeColor::*CompositionFunction)(const NativeColor&);
+		surface.compositePixel(x, y, c, reinterpret_cast<CompositionFunction>(op));
 	}
 
 private:

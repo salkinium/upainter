@@ -87,6 +87,12 @@ public:
 		buffer[y * width + x] = color.getValue();
 	}
 
+	void
+	compositePixel(uint16_t x, uint16_t y, NativeColor color, void (NativeColor::*function)(const NativeColor &color) = &NativeColor::A)
+	{
+		(reinterpret_cast<NativeColor*>(buffer + y * width + x)->*function)(color);
+	}
+
 	inline void
 	setPixel(Point p, NativeColor color)
 	{

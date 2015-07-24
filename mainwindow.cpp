@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 				qreal l = 1 - hh / qreal(surface.getHeight());
 				qreal h = (ww / qreal(surface.getWidth()) + offset);
 				if (h > 1) h -= 1;
-				Color color = fromQColor(h, 1, l);
+				Color color = fromQColor(h, 1, l, 0.9);
 				surface.setPixel(ww, hh, color);
 			}
 		}
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 		painter.fillRect(clip, Color::White);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
-		painter.drawRect(outline, fromQColor(offset, 1, 0.5), Rect(20, 10, 127-40, 63-20));
+		painter.drawRect(outline, fromQColor(offset, 1, 0.5,0.5), Rect(20, 10, 127-40, 63-20), Painter<Format>::Clear);
 		l += 0.2;
 
 		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
@@ -74,8 +74,8 @@ MainWindow::MainWindow(QWidget *parent) :
 		painter.drawLine(Line(40 + int(l)%30, 32-128*cos(r), 40 + int(l)%30, 32+128*cos(r)), Color::Yellow, clip);
 		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
 
-//		painter.drawCircle(Circle(64, 32, abs(30 * sin(r))), Color::Cyan, clip);
-		painter.fillCircle(Circle(64, 32, abs(30 * sin(r))), Color::Cyan, clip);
+		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
+		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 128));
 
 		qDisplay.repaint();
 	});
