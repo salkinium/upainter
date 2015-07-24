@@ -13,20 +13,32 @@ namespace ges
 enum class
 PixelFormat
 {
-	ARGB1555 = 0,
-	L1 = 1,
-	L4 = 2,
-	L8 = 3,
-	RGB332 = 4,
-	ARGB2 = 5,
-	ARGB4 = 6,
-	RGB565 = 7,
-	Palette = 8,
+	L1 = 0,
+	AL1 = 1,
 
-	RGB1 = 0x70 | 9,
-	RGB8 = 0x70 | 10,
-	ARGB8 = 0x70 | 11,
-	L2 = 0x70 | 12,
+	L2 = 2,
+	AL2 = 3,
+
+	L4 = 4,
+	AL4 = 5,
+
+	L8 = 6,
+	AL8 = 7,
+
+	RGB332 = 8,
+	ARGB1232 = 9,
+
+	ARGB2 = 10,
+	ARGB4 = 11,
+
+	RGB565 = 12,
+	ARGB1555 = 13,
+
+	RGB1 = 14,
+	ARGB1 = 15,
+
+	RGB8 = 16,
+	ARGB8 = 17,
 };
 
 inline uint8_t
@@ -37,23 +49,28 @@ bitsPerPixel(PixelFormat format)
 		case PixelFormat::L1:
 			return 1;
 
+		case PixelFormat::AL1:
 		case PixelFormat::L2:
 #ifndef XPCC__OS_HOSTED
 			return 2;
 #endif
 
+		case PixelFormat::AL2:
 		case PixelFormat::L4:
+		case PixelFormat::RGB1:
+		case PixelFormat::ARGB1:
 #ifndef XPCC__OS_HOSTED
 			return 4;
 #endif
 
+		case PixelFormat::AL4:
 		case PixelFormat::L8:
 		case PixelFormat::RGB332:
-		case PixelFormat::RGB1:
+		case PixelFormat::ARGB1232:
 		case PixelFormat::ARGB2:
-		case PixelFormat::Palette:
 			return 8;
 
+		case PixelFormat::AL8:
 		case PixelFormat::ARGB4:
 		case PixelFormat::ARGB1555:
 		case PixelFormat::RGB565:
