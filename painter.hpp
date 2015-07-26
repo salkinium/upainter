@@ -6,7 +6,7 @@
 #include <xpcc/ui/animation/interpolation.hpp>
 #include <xpcc/math/utils/misc.hpp>
 
-#include "geometry/line.hpp"
+#include "geometry/point.hpp"
 #include "geometry/line.hpp"
 #include "geometry/rect.hpp"
 #include "geometry/circle.hpp"
@@ -20,36 +20,85 @@ namespace ges
 template< PixelFormat Format >
 class Painter
 {
-	typedef typename Surface<Format>::NativeColor NativeColor;
-	typedef void (NativeColor::*CompositionFunction)(const NativeColor&);
 public:
-	typedef Surface<Format> Surface;
+	using Surface = Surface<Format>;
+	using NativeColor = typename Surface::NativeColor;
 
-	static constexpr CompositionFunction Clear = &NativeColor::Clear;
+	template <PixelFormat CompositionFormat>
+	using CompositionOperator = void (NativeColor::*)(const PixelColor<CompositionFormat> &color);
 
-	static constexpr CompositionFunction A = &NativeColor::A;
-	static constexpr CompositionFunction B = &NativeColor::B;
+	// native composition operators
+	static constexpr CompositionOperator<Format> Clear = &NativeColor::Clear;
 
-	static constexpr CompositionFunction AoverB = &NativeColor::AoverB;
-	static constexpr CompositionFunction BoverA = &NativeColor::BoverA;
+	static constexpr CompositionOperator<Format> A = &NativeColor::A;
+	static constexpr CompositionOperator<Format> B = &NativeColor::B;
 
-	static constexpr CompositionFunction AinB = &NativeColor::AinB;
-	static constexpr CompositionFunction BinA = &NativeColor::BinA;
+	static constexpr CompositionOperator<Format> AoverB = &NativeColor::AoverB;
+	static constexpr CompositionOperator<Format> BoverA = &NativeColor::BoverA;
 
-	static constexpr CompositionFunction AoutB = &NativeColor::AoutB;
-	static constexpr CompositionFunction BoutA = &NativeColor::BoutA;
+	static constexpr CompositionOperator<Format> AinB = &NativeColor::AinB;
+	static constexpr CompositionOperator<Format> BinA = &NativeColor::BinA;
 
-	static constexpr CompositionFunction AatopB = &NativeColor::AatopB;
-	static constexpr CompositionFunction BatopA = &NativeColor::BatopA;
+	static constexpr CompositionOperator<Format> AoutB = &NativeColor::AoutB;
+	static constexpr CompositionOperator<Format> BoutA = &NativeColor::BoutA;
 
-	static constexpr CompositionFunction Xor = &NativeColor::Xor;
+	static constexpr CompositionOperator<Format> AatopB = &NativeColor::AatopB;
+	static constexpr CompositionOperator<Format> BatopA = &NativeColor::BatopA;
 
+	static constexpr CompositionOperator<Format> Xor = &NativeColor::Xor;
+	static constexpr CompositionOperator<Format> Plus = &NativeColor::Plus;
 
+private:
+	template <PixelFormat CompositionFormat>
+	class CompositionObject
+	{
+	public:
+		CompositionObject(const PixelColor<CompositionFormat> &color,
+						  const CompositionOperator<CompositionFormat> composition) :
+			color(color), composition(composition) {}
+
+		void
+		operator ()(Surface &surface, int16_t x, int16_t y) const
+		{
+			surface.compositePixel(x, y, color, composition);
+		}
+
+	private:
+		const PixelColor<CompositionFormat> &color;
+		const CompositionOperator<CompositionFormat> composition;
+	};
+
+	using CompositionHandler = CompositionObject<PixelFormat::ARGB8>;
+
+public:
 	Painter(Surface &surface) :
 		surface(surface) {}
 
+public:
+	template <PixelFormat CompositionFormat>
 	void
-	drawLine(const Line &l, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
+	drawLine(const Line &l,
+			 const PixelColor<CompositionFormat> &color,
+			 CompositionOperator<CompositionFormat> composition)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawLineImpl(l, reinterpret_cast<CompositionHandler&>(obj));
+	}
+
+	template <PixelFormat CompositionFormat>
+	void
+	drawLine(const Line &l,
+			 const PixelColor<CompositionFormat> &color,
+			 Rect clip = Rect(),
+			 CompositionOperator<CompositionFormat> composition = &NativeColor::A)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawLineImpl(l, reinterpret_cast<CompositionHandler&>(obj), clip);
+	}
+
+protected:
+	void
+	drawLineImpl(const Line &l, const CompositionHandler &handler, Rect clip = Rect())
 	{
 		if (l.isNull()) return;
 
@@ -75,7 +124,7 @@ public:
 			bY = xpcc::max(bY, clip.getTop());
 			eY = xpcc::min(eY, clip.getBottom());
 			// draw visible and clipped line
-			drawVerticalLine(c, op, bX, bY, eY);
+//			drawVerticalLine(c, op, bX, bY, eY);
 			return;
 		}
 
@@ -93,43 +142,10 @@ public:
 			bX = xpcc::max(bX, clip.getLeft());
 			eX = xpcc::min(eX, clip.getRight());
 			// draw visible and clipped line
-			drawHorizontalLine(c, op, bY, bX, eX);
+//			drawHorizontalLine(c, op, bY, bX, eX);
 			return;
 		}
 
-		/*
-		{
-			// classic bresenham without any clipping during setup
-			const int16_t dx =  abs(eX-bX);
-			const int16_t dy = -abs(eY-bY);
-
-			const int8_t sy = bY < eY ? 1 : -1;
-
-			// error value e_xy
-			int32_t err = dx + dy;
-			int32_t e2;
-
-			while (true)
-			{
-				// this is guard-band clipping
-				if (clip.contains(bX, bY)) surface.setPixel(bX, bY, c);
-
-				if (bX == eX and bY == eY) break;
-
-				e2 = 2*err;
-				if (e2 > dy) // e_xy + e_x > 0
-				{
-					err += dy;
-					bX++;
-				}
-				if (e2 < dx) // e_xy + e_y < 0
-				{
-					err += dx;
-					bY += sy;
-				}
-			}
-		}
-		/*/
 		{
 			// code below is based directly on the paper:
 			// Yevgeny P. Kuzmin. Bresenham's Line Generation Algorithm with
@@ -276,7 +292,7 @@ public:
 				// if you get a crash here, check your bX,bY,eX,eY coordinates to see
 				// they are in a reasonable range -- it could cause integer overflow
 				// in this function
-				compositePixel(*d0, *d1, c, op);
+				handler(surface, *d0, *d1);
 
 				if (e >= 0)
 				{
@@ -290,10 +306,62 @@ public:
 				xd += stx;
 			}
 		}
-		//*/
 	}
 
-	void drawCircle(const Circle &ci, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
+
+//public:
+//	void drawEllipse(int16_t xm, int16_t ym, int16_t a, int16_t b,
+//					 NativeColor c)
+//	{
+//		uint32_t x = -a, y = 0;					// II. quadrant from bottom left to top right
+//		uint32_t e2 = b, dx = (1+2*x)*e2*e2;	// error increment
+//		uint32_t dy = x*x, err = dx+dy;			// error of 1.step
+
+//		do {
+//			surface.setPixel(xm-x, ym+y, c);	//   I. Quadrant
+//			surface.setPixel(xm+x, ym+y, c);	//  II. Quadrant
+//			surface.setPixel(xm+x, ym-y, c);	// III. Quadrant
+//			surface.setPixel(xm-x, ym-y, c);	//  IV. Quadrant
+//			e2 = 2*err;
+//			if (e2 >= dx) { x++; err += dx += 2*int32_t(b)*b; }	// x step
+//			if (e2 <= dy) { y++; err += dy += 2*int32_t(a)*a; }	// y step
+//		}
+//		while (x <= 0);
+
+//		// too early stop for flat ellipses with a=1
+//		while (y++ < b)
+//		{
+//			// -> finish tip of ellipse
+//			surface.setPixel(xm, ym+y, c);
+//			surface.setPixel(xm, ym-y, c);
+//		}
+//	}
+
+public:
+	template <PixelFormat CompositionFormat>
+	void
+	drawCircle(const Circle &circle,
+			   const PixelColor<CompositionFormat> &color,
+			   CompositionOperator<CompositionFormat> composition)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawCircleImpl(circle, reinterpret_cast<CompositionHandler&>(obj));
+	}
+
+	template <PixelFormat CompositionFormat>
+	void
+	drawCircle(const Circle &circle,
+			   const PixelColor<CompositionFormat> &color,
+			   Rect clip = Rect(),
+			   CompositionOperator<CompositionFormat> composition = &NativeColor::A)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawCircleImpl(circle, reinterpret_cast<CompositionHandler&>(obj), clip);
+	}
+
+protected:
+	void
+	drawCircleImpl(const Circle &ci, const CompositionHandler &handler, Rect clip = Rect())
 	{
 		// we don't draw empty circles
 		if (ci.isEmpty()) return;
@@ -303,6 +371,12 @@ public:
 
 		// only draw intersecting circles
 		if (not ci.intersects(clip)) return;
+
+		// only draw a pixel if radius is zero
+		if (ci.isNull()) {
+			handler(surface, ci.getX(), ci.getY());
+			return;
+		}
 
 		// start the drawing
 		int16_t r = ci.getRadius();
@@ -323,13 +397,13 @@ public:
 			 * so this uses the cheesy guard band clipping way for every pixel.
 			 */
 			if (clip.contains(ci.getX() - x, ci.getY() + y))
-				compositePixel(ci.getX() - x, ci.getY() + y, c, op);	//   I. Quadrant +x +y
+				handler(surface, ci.getX() - x, ci.getY() + y);	//   I. Quadrant +x +y
 			if (clip.contains(ci.getX() - y, ci.getY() - x))
-				compositePixel(ci.getX() - y, ci.getY() - x, c, op);	//  II. Quadrant -x +y
+				handler(surface, ci.getX() - y, ci.getY() - x);	//  II. Quadrant -x +y
 			if (clip.contains(ci.getX() + x, ci.getY() - y))
-				compositePixel(ci.getX() + x, ci.getY() - y, c, op);	// III. Quadrant -x -y
+				handler(surface, ci.getX() + x, ci.getY() - y);	// III. Quadrant -x -y
 			if (clip.contains(ci.getX() + y, ci.getY() + x))
-				compositePixel(ci.getX() + y, ci.getY() + x, c, op);	//  IV. Quadrant +x -y
+				handler(surface, ci.getX() + y, ci.getY() + x);	//  IV. Quadrant +x -y
 
 			r = err;
 
@@ -342,7 +416,31 @@ public:
 		while (x < 0);
 	}
 
-	void fillCircle(const Circle &ci, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
+public:
+	template <PixelFormat CompositionFormat>
+	void
+	fillCircle(const Circle &circle,
+			   const PixelColor<CompositionFormat> &color,
+			   CompositionOperator<CompositionFormat> composition)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		fillCircleImpl(circle, reinterpret_cast<CompositionHandler&>(obj));
+	}
+
+	template <PixelFormat CompositionFormat>
+	void
+	fillCircle(const Circle &circle,
+			   const PixelColor<CompositionFormat> &color,
+			   Rect clip = Rect(),
+			   CompositionOperator<CompositionFormat> composition = &NativeColor::A)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		fillCircleImpl(circle, reinterpret_cast<CompositionHandler&>(obj), clip);
+	}
+
+protected:
+	void
+	fillCircleImpl(const Circle &ci, const CompositionHandler &handler, Rect clip = Rect())
 	{
 		// we don't draw empty circles
 		if (ci.isEmpty()) return;
@@ -352,8 +450,10 @@ public:
 
 		// only draw intersecting circles
 		if (not ci.intersects(clip)) return;
+
+		// only draw a pixel if radius is zero
 		if (ci.isNull()) {
-			surface.setPixel(ci.getOrigin(), c);
+			handler(surface, ci.getX(), ci.getY());
 			return;
 		}
 
@@ -364,16 +464,16 @@ public:
 		int16_t err = 2 - 2 * r;
 		int16_t prevY = 0;
 
-		drawHorizontalLineClipped(c, op, ci.getY(), ci.getX() - r, ci.getX() + r, clip);
+		drawHorizontalLineClipped(handler, ci.getY(), ci.getX() - r, ci.getX() + r, clip);
 
 		do
 		{
 			if (y != prevY)
 			{
 				// above origin, left to right
-				drawHorizontalLineClipped(c, op, ci.getY() + y, ci.getX() + x, ci.getX() - x, clip);
+				drawHorizontalLineClipped(handler, ci.getY() + y, ci.getX() + x, ci.getX() - x, clip);
 				// below left to right
-				drawHorizontalLineClipped(c, op, ci.getY() - y, ci.getX() + x, ci.getX() - x, clip);
+				drawHorizontalLineClipped(handler, ci.getY() - y, ci.getX() + x, ci.getX() - x, clip);
 				prevY = y;
 			}
 
@@ -389,8 +489,31 @@ public:
 		while (x < 0);
 	}
 
+public:
+	template <PixelFormat CompositionFormat>
 	void
-	drawRect(const Rect &r, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
+	drawRect(const Rect &rectangle,
+			   const PixelColor<CompositionFormat> &color,
+			   CompositionOperator<CompositionFormat> composition)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawRectImpl(rectangle, reinterpret_cast<CompositionHandler&>(obj));
+	}
+
+	template <PixelFormat CompositionFormat>
+	void
+	drawRect(const Rect &rectangle,
+			   const PixelColor<CompositionFormat> &color,
+			   Rect clip = Rect(),
+			   CompositionOperator<CompositionFormat> composition = &NativeColor::A)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		drawRectImpl(rectangle, reinterpret_cast<CompositionHandler&>(obj), clip);
+	}
+
+protected:
+	void
+	drawRectImpl(const Rect &r, const CompositionHandler &handler, Rect clip = Rect())
 	{
 		clip = surface.clip(clip);
 		// don't even bother if rect is not in clip area
@@ -413,39 +536,61 @@ public:
 
 		if (clip.getTop() <= r.getTop()) {	// top line
 			mt = r.getTop();
-			drawHorizontalLine(c, op, r.getTop(), ml+1, mr-1);
+			drawHorizontalLine(handler, r.getTop(), ml+1, mr-1);
 		}
 
 		if (rb <= cb) {	// bottom line
 			mb = rb;
-			drawHorizontalLine(c, op, rb, ml+1, mr-1);
+			drawHorizontalLine(handler, rb, ml+1, mr-1);
 		}
 
 		if (clip.getLeft() <= r.getLeft()) {	// left line
-			drawVerticalLine(c, op, r.getLeft(), mt, mb);
+			drawVerticalLine(handler, r.getLeft(), mt, mb);
 		}
 
 		if (rr <= cr) {	// right line
-			drawVerticalLine(c, op, rr, mt, mb);
+			drawVerticalLine(handler, rr, mt, mb);
 		}
 	}
 
+public:
+	template <PixelFormat CompositionFormat>
 	void
-	fillRect(const Rect &r, NativeColor c, Rect clip = Rect(), CompositionFunction op = AoverB)
+	fillRect(const Rect &rectangle,
+			 const PixelColor<CompositionFormat> &color,
+			 CompositionOperator<CompositionFormat> composition)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		fillRectImpl(rectangle, reinterpret_cast<CompositionHandler&>(obj));
+	}
+
+	template <PixelFormat CompositionFormat>
+	void
+	fillRect(const Rect &rectangle,
+			 const PixelColor<CompositionFormat> &color,
+			 Rect clip = Rect(),
+			 CompositionOperator<CompositionFormat> composition = &NativeColor::A)
+	{
+		CompositionObject<CompositionFormat> obj(color, composition);
+		fillRectImpl(rectangle, reinterpret_cast<CompositionHandler&>(obj), clip);
+	}
+
+protected:
+	void
+	fillRectImpl(const Rect &r, const CompositionHandler &handler, Rect clip = Rect())
 	{
 		clip = r.intersected(surface.clip(clip));
 		// there is no need to test for isEmpty() !
 
 		for (int16_t yy = clip.getTop(); yy <= clip.getBottom(); yy++)
 		{
-			drawHorizontalLine(c, op, yy, clip.getLeft(), clip.getRight());
+			drawHorizontalLine(handler, yy, clip.getLeft(), clip.getRight());
 		}
 	}
 
 protected:
-
 	void
-	drawHorizontalLineClipped(NativeColor c, CompositionFunction op, int16_t y, int16_t beginX, int16_t endX, const Rect &clip)
+	drawHorizontalLineClipped(const CompositionHandler &handler, int16_t y, int16_t beginX, int16_t endX, const Rect &clip)
 	{
 		if (y >= clip.getTop() and y <= clip.getBottom())
 		{
@@ -454,37 +599,30 @@ protected:
 			if (beginX <= cR)
 			{
 				// line starts before right of clip window
-				drawHorizontalLine(c, op, y, std::max(beginX, clip.getLeft()), std::min(endX, cR));
+				drawHorizontalLine(handler, y, std::max(beginX, clip.getLeft()), std::min(endX, cR));
 			}
 		}
 	}
 
 
 	void
-	drawHorizontalLine(NativeColor color, CompositionFunction op,
+	drawHorizontalLine(const CompositionHandler &handler,
 					   int16_t y, int16_t beginX, int16_t endX)
 	{
 		for (int16_t xx = beginX; xx <= endX; xx++)
 		{
-			compositePixel(xx, y, color, op);
+			handler(surface, xx, y);
 		}
 	}
 
 	void
-	drawVerticalLine(NativeColor color, CompositionFunction op,
+	drawVerticalLine(const CompositionHandler &handler,
 					 int16_t x, int16_t beginY, int16_t endY)
 	{
 		for (int16_t yy = beginY; yy <= endY; yy++)
 		{
-			compositePixel(x, yy, color, op);
+			handler(surface, x, yy);
 		}
-	}
-
-	void inline
-	compositePixel(int16_t x, int16_t y, const NativeColor &c, CompositionFunction op)
-	{
-		typedef void (NativeColor::*CompositionFunction)(const NativeColor&);
-		surface.compositePixel(x, y, c, reinterpret_cast<CompositionFunction>(op));
 	}
 
 private:

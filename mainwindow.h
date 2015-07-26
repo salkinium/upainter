@@ -13,9 +13,7 @@ namespace Ui {
 class MainWindow;
 }
 
-static uint8_t staticBuffer[128*64*4];
-
-static constexpr PixelFormat Format = PixelFormat::ARGB8;
+static constexpr PixelFormat Format = PixelFormat::RGB8;
 
 class MainWindow : public QMainWindow
 {

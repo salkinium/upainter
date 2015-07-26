@@ -1,5 +1,5 @@
 #include "qdisplay.hpp"
-#include "color.hpp"
+#include "pixel_color.hpp"
 
 namespace modm
 {

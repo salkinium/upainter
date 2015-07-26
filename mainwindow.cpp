@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 				qreal l = 1 - hh / qreal(surface.getHeight());
 				qreal h = (ww / qreal(surface.getWidth()) + offset);
 				if (h > 1) h -= 1;
-				Color color = fromQColor(h, 1, l, 0.9);
+				Color color = fromQColor(h, 1, l);
 				surface.setPixel(ww, hh, color);
 			}
 		}
@@ -54,28 +54,26 @@ MainWindow::MainWindow(QWidget *parent) :
 		static float l = 10;
 
 		Rect clip = Rect(40 + int(-l/2) % 100, 20 +int(-l/4)%50, 60, 40);
-//		Rect clip = Rect(40 , 20 , 60, 40);
-
 		painter.fillRect(clip, Color::White);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
-		painter.drawRect(outline, fromQColor(offset, 1, 0.5,0.5), Rect(20, 10, 127-40, 63-20), Painter<Format>::Clear);
+		painter.drawRect(outline, fromQColor(offset, 1, 0.5,0.5), Rect(20, 10, 127-40, 63-20), &Painter<Format>::NativeColor::Plus);
 		l += 0.2;
 
 		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
 
-		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red, clip);
+//		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red, clip);
 
 		Line line(rand()%300-150, rand()%200 - 100, rand()%300 -150, rand()%200 - 100);
 //		Line line(-141, 56, 110, 70);
 //		qDebug() << "(" << line.getX1() << "," << line.getY1() << ") ---> (" << line.getX2() << "," << line.getY2() << ")";
-		painter.drawLine(line, Color::Red);
+		painter.drawLine(line, Color(0xff, 0, 0, 0x7f), &Painter<Format>::NativeColor::AoverB);
 		painter.drawLine(line, Color::Blue, clip);
 
 		painter.drawLine(Line(40 + int(l)%30, 32-128*cos(r), 40 + int(l)%30, 32+128*cos(r)), Color::Yellow, clip);
 		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
 
 		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
-		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 128));
+		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 128), &Painter<Format>::NativeColor::AoverB);
 
 		qDisplay.repaint();
 	});

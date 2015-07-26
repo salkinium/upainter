@@ -24,6 +24,7 @@ class Surface
 	using BufferType = typename PixelColor<Format>::Type;
 public:
 	using NativeColor = PixelColor<Format>;
+	using AlphaColor = typename PixelColor<Format>::AlphaColor;
 
 	template< uint16_t Width, uint16_t Height >
 	using Buffer = PixelBuffer<Width, Height, Format>;
@@ -87,16 +88,25 @@ public:
 		buffer[y * width + x] = color.getValue();
 	}
 
-	void
-	compositePixel(uint16_t x, uint16_t y, NativeColor color, void (NativeColor::*function)(const NativeColor &color) = &NativeColor::A)
-	{
-		(reinterpret_cast<NativeColor*>(buffer + y * width + x)->*function)(color);
-	}
-
 	inline void
 	setPixel(Point p, NativeColor color)
 	{
 		setPixel(p.getX(), p.getY(), color);
+	}
+
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	{
+		(reinterpret_cast<NativeColor*>(buffer + y * width + x)->*composition)(color);
+	}
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(const Point p, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	{
+		(reinterpret_cast<NativeColor*>(buffer + p.getY() * width + p.getX())->*composition)(color);
 	}
 
 	inline void
@@ -114,9 +124,6 @@ public:
 	NativeColor
 	getPixel(uint16_t x, uint16_t y) const
 	{
-		if (x >= width or y >= height)
-			return NativeColor(0);
-
 		return NativeColor(buffer[y * width + x]);
 	}
 

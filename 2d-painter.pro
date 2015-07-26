@@ -11,7 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = 2d-painter
 TEMPLATE = app
 
-CONFIG += c++11
+#CONFIG += c++14
+QMAKE_CXXFLAGS += -std=c++1y
 
 macx {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
@@ -27,13 +28,12 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    color.cpp \
-    qdisplay.cpp
+    qdisplay.cpp \
+    pixel_color.cpp
 
 HEADERS  += mainwindow.h \
     surface.hpp \
     pixel_format.hpp \
-    color.hpp \
     surface/surface_l1.hpp \
     surface/surface_l4.hpp \
     pixel_buffer.hpp \
@@ -44,6 +44,8 @@ HEADERS  += mainwindow.h \
     geometry/line.hpp \
     geometry/rect.hpp \
     painter.hpp \
-    geometry/circle.hpp
+    geometry/circle.hpp \
+    pixel_color/pixel_color_rgb8.hpp \
+    pixel_color/pixel_color_l1.hpp
 
 FORMS    += mainwindow.ui

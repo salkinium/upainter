@@ -2,7 +2,6 @@
 #define MODM_GES_PIXEL_COLOR_HPP
 
 #include <stdint.h>
-#include "color.hpp"
 #include "pixel_format.hpp"
 #include <xpcc/architecture/detect.hpp>
 
@@ -18,121 +17,216 @@ class PixelColor;
 template<>
 class PixelColor<PixelFormat::ARGB8>
 {
+	using ThisColor = PixelColor<PixelFormat::ARGB8>;
+public:
+	static const ThisColor Black;
+	static const ThisColor White;
+
+	static const ThisColor Red;
+	static const ThisColor Green;
+	static const ThisColor Blue;
+
+	static const ThisColor Yellow;
+	static const ThisColor Cyan;
+	static const ThisColor Magenta;
+
 public:
 	using Type = uint32_t;
+	using AlphaColor = ThisColor;
 	static constexpr uint8_t Depth = 24;
 	static constexpr uint8_t Bits = 32;
+	static constexpr PixelFormat Format = PixelFormat::ARGB8;
+
+	explicit constexpr
+	PixelColor() :
+		composite(0) {}
 
 	explicit constexpr
 	PixelColor(const Type value) :
-		value(value) {}
+		composite(value) {}
 
 	constexpr
-	PixelColor(const Color color) :
-		value(color.getValue()) {}
+	PixelColor(const uint8_t red, const uint8_t green, const uint8_t blue) :
+		parts{red, green, blue, 0xff}
+	{}
+
+	constexpr
+	PixelColor(const uint8_t red, const uint8_t green, const uint8_t blue, const uint8_t alpha) :
+		parts{uint8_t(uint16_t(red) * alpha / 255),
+			  uint8_t(uint16_t(green) * alpha / 255),
+			  uint8_t(uint16_t(blue) * alpha / 255),
+			  alpha}
+	{}
 
 	constexpr Type
 	getValue() const
-	{ return value; }
+	{ return composite; }
 
-	explicit constexpr
-	operator Color() const
-	{ return Color(value); }
+	constexpr uint8_t
+	getRed() const
+	{ return parts[0]; }
+
+	constexpr uint8_t
+	getGreen() const
+	{ return parts[1]; }
+
+	constexpr uint8_t
+	getBlue() const
+	{ return parts[2]; }
+
+	constexpr uint8_t
+	getAlpha() const
+	{ return parts[3]; }
 
 	constexpr bool
-	operator== (const PixelColor<PixelFormat::ARGB8> &other) const
-	{ return value == other.value; }
+	operator== (const ThisColor &other) const
+	{ return (composite == other.composite); }
+
+
+	// Porter and Duff's compositing operations
+
+	void
+	Clear(const ThisColor &)
+	{ composite = 0; }
 
 
 	void
-	Clear(const PixelColor<PixelFormat::ARGB8> &)
-	{ value = 0; }
-
-
-	void
-	A(const PixelColor<PixelFormat::ARGB8> &a)
-	{ value = a.value; }
+	A(const ThisColor &a)
+	{ composite = a.composite; }
 
 	void
-	B(const PixelColor<PixelFormat::ARGB8> &)
+	B(const ThisColor &)
 	{ }
 
 
 	void
-	AoverB(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->AoverB(reinterpret_cast<const Color&>(b)); }
+	AoverB(const ThisColor &a)
+	{ compose(a, 255, 255 - a.getAlpha()); }
 
 	void
-	BoverA(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->BoverA(reinterpret_cast<const Color&>(b)); }
-
-
-	void
-	AinB(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->AinB(reinterpret_cast<const Color&>(b)); }
-
-	void
-	BinA(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->BinA(reinterpret_cast<const Color&>(b)); }
+	BoverA(const ThisColor &a)
+	{ compose(a, 255 - getAlpha(), 255); }
 
 
 	void
-	AoutB(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->AoutB(reinterpret_cast<const Color&>(b)); }
+	AinB(const ThisColor &a)
+	{ compose(a, getAlpha(), 0); }
 
 	void
-	BoutA(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->BoutA(reinterpret_cast<const Color&>(b)); }
-
-
-	void
-	AatopB(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->AatopB(reinterpret_cast<const Color&>(b)); }
-
-	void
-	BatopA(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->BatopA(reinterpret_cast<const Color&>(b)); }
+	BinA(const ThisColor &a)
+	{ compose(a, 0, a.getAlpha()); }
 
 
 	void
-	Xor(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->Xor(reinterpret_cast<const Color&>(b)); }
+	AoutB(const ThisColor &a)
+	{ compose(a, 255 - getAlpha(), 0); }
+
+	void
+	BoutA(const ThisColor &a)
+	{ compose(a, 0, 255 - a.getAlpha()); }
 
 
 	void
-	Plus(const PixelColor<PixelFormat::ARGB8> &b)
-	{ reinterpret_cast<Color*>(this)->Plus(reinterpret_cast<const Color&>(b)); }
+	AatopB(const ThisColor &a)
+	{ compose(a, getAlpha(), 255 - a.getAlpha()); }
+
+	void
+	BatopA(const ThisColor &a)
+	{ compose(a, 255 - getAlpha(), a.getAlpha()); }
+
+
+	void
+	Xor(const ThisColor &a)
+	{ compose(a, 255 - getAlpha(), 255 - a.getAlpha()); }
+
+
+	void
+	Plus(const ThisColor &a)
+	{ compose(a, 255, 255); }
+
+
+protected:
+	// see Porter and Duff's "Compositing Digital Images"
+	void
+	compose(const ThisColor &cA, const uint8_t fa, const uint8_t fb)
+	{
+		uint32_t a, r, g, b;
+		a = cA.getAlpha() * uint32_t(fa);
+		r = cA.getRed()   * uint32_t(fa);
+		g = cA.getGreen() * uint32_t(fa);
+		b = cA.getBlue()  * uint32_t(fa);
+
+		a += getAlpha() * uint32_t(fb);
+		r += getRed()   * uint32_t(fb);
+		g += getGreen() * uint32_t(fb);
+		b += getBlue()  * uint32_t(fb);
+
+		if (a >= 255*255) a = 255; else a /= 255;
+		if (r >= 255*255) r = 255; else r /= 255;
+		if (g >= 255*255) g = 255; else g /= 255;
+		if (b >= 255*255) b = 255; else b /= 255;
+
+		parts[0] = r;
+		parts[1] = g;
+		parts[2] = b;
+		parts[3] = a;
+	}
 
 private:
-	Type value;
+	union
+	{
+		uint32_t composite;
+		uint8_t parts[4];
+	};
+
+	template <PixelFormat F>
+	friend class PixelColor;
 };
+
+using Color = PixelColor<PixelFormat::ARGB8>;
 
 template<>
 class PixelColor<PixelFormat::L1>
 {
+	using PColor = PixelColor<PixelFormat::L1>;
 public:
 	using Type = uint8_t;
 	static constexpr uint8_t Depth = 1;
 	static constexpr uint8_t Bits = 1;
 
 	explicit constexpr
+	PixelColor(const Type grayscale, const Type alpha) :
+		value((grayscale ? 1 : 0) | (alpha >= 127 ? 0b10 : 0)) {}
+
+	explicit constexpr
 	PixelColor(const Type value) :
-		value(value ? 1 : 0) {}
+		value(value & 0x03) {}
 
 	// Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
 	constexpr
 	PixelColor(const Color color) :
 		value((color.getRed()   * 0.2125 +
 			   color.getGreen() * 0.7154 +
-			   color.getBlue()  * 0.0721 ) >= 127 ? 1 : 0) {}
+			   color.getBlue()  * 0.0721 ) >= 127 ? 1 : 0 |
+			   (color.getAlpha() >= 127 ? 0b10 : 0)) {}
 
 	constexpr Type
 	getValue() const
 	{ return value; }
 
+	constexpr Type
+	getGrayscale() const
+	{ return value & 0b01; }
+
+	constexpr Type
+	getAlpha() const
+	{ return value & 0b10; }
+
 	explicit constexpr
 	operator Color() const
-	{ return value ? Color::White : Color::Black; }
+	{
+		return Color(((value & 0b01) * 0xffffff) | ((value & 0b10) * 0x7F800000));
+	}
 
 	constexpr bool
 	operator== (const PixelColor<PixelFormat::L1> &other) const
@@ -177,6 +271,12 @@ public:
 	operator== (const PixelColor<PixelFormat::L2> &other) const
 	{ return value == other.value; }
 
+	void
+	over(const PixelColor<PixelFormat::L2> &c)
+	{
+		value = c.value; // no blending possible
+	}
+
 private:
 	Type value;
 };
@@ -216,6 +316,12 @@ public:
 	operator== (const PixelColor<PixelFormat::L4> &other) const
 	{ return value == other.value; }
 
+	void
+	over(const PixelColor<PixelFormat::L4> &c)
+	{
+		value = c.value; // no blending possible
+	}
+
 private:
 	Type value;
 };
@@ -249,6 +355,12 @@ public:
 	constexpr bool
 	operator== (const PixelColor<PixelFormat::L8> &other) const
 	{ return value == other.value; }
+
+	void
+	over(const PixelColor<PixelFormat::L8> &c)
+	{
+		value = c.value; // no blending possible
+	}
 
 private:
 	Type value;
@@ -287,6 +399,12 @@ public:
 	operator== (const PixelColor<PixelFormat::RGB1> &other) const
 	{ return value == other.value; }
 
+	void
+	over(const PixelColor<PixelFormat::RGB1> &c)
+	{
+		value = c.value; // no blending possible
+	}
+
 private:
 	Type value;
 };
@@ -323,6 +441,12 @@ public:
 	constexpr bool
 	operator== (const PixelColor<PixelFormat::RGB332> &other) const
 	{ return value == other.value; }
+
+	void
+	over(const PixelColor<PixelFormat::RGB332> &c)
+	{
+		value = c.value; // no blending possible
+	}
 
 private:
 	Type value;
@@ -361,37 +485,11 @@ public:
 	operator== (const PixelColor<PixelFormat::RGB565> &other) const
 	{ return value == other.value; }
 
-private:
-	Type value;
-};
-
-template<>
-class PixelColor<PixelFormat::RGB8>
-{
-public:
-	using Type = uint32_t;
-	static constexpr uint8_t Depth = 24;
-	static constexpr uint8_t Bits = 32;
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(0xff000000 | value) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(color.getValue() | 0xff000000) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(value); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::RGB8> &other) const
-	{ return value == other.value; }
+	void
+	over(const PixelColor<PixelFormat::RGB565> &c)
+	{
+		value = c.value; // no blending possible
+	}
 
 private:
 	Type value;
@@ -420,6 +518,22 @@ public:
 	getValue() const
 	{ return value; }
 
+	constexpr uint8_t
+	getRed() const
+	{ return (value & 0x03); }
+
+	constexpr uint8_t
+	getGreen() const
+	{ return (value & 0x0c) >> 2; }
+
+	constexpr uint8_t
+	getBlue() const
+	{ return (value & 0x30) >> 4; }
+
+	constexpr uint8_t
+	getAlpha() const
+	{ return (value & 0xc0) >> 6; }
+
 	explicit constexpr
 	operator Color() const
 	{ return Color(((value & 0xc0) * 0x1540000) |
@@ -430,6 +544,67 @@ public:
 	constexpr bool
 	operator== (const PixelColor<PixelFormat::ARGB2> &other) const
 	{ return value == other.value; }
+
+	void
+	over(const PixelColor<PixelFormat::ARGB2> &c)
+	{
+		if ((c.value & 0xc0) == 0xc0)
+		{
+			value = c.value;
+			return;
+		}
+
+		{
+			// this class is B, other color is A
+			uint8_t a, r, g, b;
+			a = c.getAlpha();
+
+			if ((value & 0xc0) == 0xc0)
+			{
+				// C = alphaA * A + (1 - alphaA) * B
+				r = c.getRed() * a;	// normalization by div 3 done later
+				g = c.getGreen() * a;
+				b = c.getBlue() * a;
+
+				r += getRed() * (3 - a);	// normalization by div 3 done later
+				g += getGreen() * (3 - a);
+				b += getBlue() * (3 - a);
+
+				// normalize all values!
+				r /= 3;
+				g /= 3;
+				b /= 3;
+
+				value = 0xc0;
+			}
+			else
+			{
+				// C = (alphaA * A + (1 - alphaA) * alphaB * B) / alphaC
+				r = c.getRed() * a * 3;	// normalization done by alphaC!
+				g = c.getGreen() * a * 3;
+				b = c.getBlue() * a * 3;
+				uint8_t aa = getAlpha();
+
+				// alphc = alphaA + (1 - alphaA) * alphaB
+				uint8_t c = a * 3 + (3 - a) * aa;
+
+				r += getRed() * aa * (3 - a);
+				g += getGreen() * aa * (3 - a);
+				b += getBlue() * aa * (3 - a);
+
+				r /= c;
+				g /= c;
+				b /= c;
+				c /= 3;	// normalize c
+
+				// write back
+				value = (c << 6);
+			}
+
+			// write back
+			value |= ((b << 4) | (g << 2) | r);
+		}
+	}
 
 private:
 	Type value;
@@ -458,6 +633,22 @@ public:
 	getValue() const
 	{ return value; }
 
+	constexpr uint8_t
+	getRed() const
+	{ return (value & 0x0f); }
+
+	constexpr uint8_t
+	getGreen() const
+	{ return (value & 0xf0) >> 4; }
+
+	constexpr uint8_t
+	getBlue() const
+	{ return (value & 0xf00) >> 8; }
+
+	constexpr uint8_t
+	getAlpha() const
+	{ return (value & 0xf000) >> 12; }
+
 	explicit constexpr
 	operator Color() const
 	{ return Color(((value & 0xf000) * 0x11000) |
@@ -468,6 +659,67 @@ public:
 	constexpr bool
 	operator== (const PixelColor<PixelFormat::ARGB4> &other) const
 	{ return value == other.value; }
+
+	void
+	over(const PixelColor<PixelFormat::ARGB4> &c)
+	{
+		if ((c.value & 0xf000) == 0xf000)
+		{
+			value = c.value;
+			return;
+		}
+
+		{
+			// this class is B, other color is A
+			uint16_t a, r, g, b;
+			a = c.getAlpha();
+
+			if ((value & 0xf000) == 0xf000)
+			{
+				// C = alphaA * A + (1 - alphaA) * B
+				r = c.getRed() * a;	// normalization by div 3 done later
+				g = c.getGreen() * a;
+				b = c.getBlue() * a;
+
+				r += getRed() * (15 - a);	// normalization by div 3 done later
+				g += getGreen() * (15 - a);
+				b += getBlue() * (15 - a);
+
+				// normalize all values!
+				r /= 15;
+				g /= 15;
+				b /= 15;
+
+				value = 0xf000;
+			}
+			else
+			{
+				// C = (alphaA * A + (1 - alphaA) * alphaB * B) / alphaC
+				r = c.getRed() * a * 15;	// normalization done by alphaC!
+				g = c.getGreen() * a * 15;
+				b = c.getBlue() * a * 15;
+				uint8_t aa = getAlpha();
+
+				// alphc = alphaA + (1 - alphaA) * alphaB
+				uint8_t c = a * 15 + (15 - a) * aa;
+
+				r += getRed() * aa * (15 - a);
+				g += getGreen() * aa * (15 - a);
+				b += getBlue() * aa * (15 - a);
+
+				r /= c;
+				g /= c;
+				b /= c;
+				c /= 15;	// normalize c
+
+				// write back
+				value = (c << 12);
+			}
+
+			// write back
+			value |= ((b << 8) | (g << 4) | r);
+		}
+	}
 
 private:
 	Type value;
@@ -507,6 +759,15 @@ public:
 	operator== (const PixelColor<PixelFormat::ARGB1555> &other) const
 	{ return value == other.value; }
 
+	void
+	over(const PixelColor<PixelFormat::ARGB1555> &c)
+	{
+		if (c.value & 0x8000)
+		{
+			value = c.value;
+		}
+	}
+
 private:
 	Type value;
 };
@@ -515,6 +776,8 @@ private:
 } // namespace ges
 
 } // namespace modm
+
+#include "pixel_color/pixel_color_rgb8.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 
