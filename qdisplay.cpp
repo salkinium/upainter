@@ -1,6 +1,8 @@
 #include "qdisplay.hpp"
 #include "pixel_color.hpp"
 
+#include <QDebug>
+
 namespace modm
 {
 
@@ -20,9 +22,13 @@ toQImageFormat(PixelFormat format)
 
 		case PixelFormat::ARGB2:
 		case PixelFormat::RGB332:
+		case PixelFormat::ARGB1:
 		case PixelFormat::RGB1:
+		case PixelFormat::AL1:
 		case PixelFormat::L2:
+		case PixelFormat::AL2:
 		case PixelFormat::L4:
+		case PixelFormat::AL4:
 		case PixelFormat::L8:
 			return QImage::Format_Indexed8;
 
@@ -55,12 +61,34 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 		QVector<QRgb> table{qRgb(0,0,0), qRgb(0xff, 0xff, 0xff)};
 		image.setColorTable(table);
 	}
+	else if (format == PixelFormat::AL1)
+	{
+		QVector<QRgb> table
+		{
+			Color(ColorAL1(0b00)).getValue(),
+			Color(ColorAL1(0b01)).getValue(),
+			Color(ColorAL1(0b10)).getValue(),
+			Color(ColorAL1(0b11)).getValue(),
+		};
+		image.setColorTable(table);
+	}
 	else if (format == PixelFormat::L2)
 	{
-		QVector<QRgb> table(4);
-		for(int i = 0; i < 4; i++)
+		QVector<QRgb> table
 		{
-			Color c = Color(PixelColor<PixelFormat::L2>(uint8_t(i)));
+			Color(ColorL2(0b00)).getValue(),
+			Color(ColorL2(0b01)).getValue(),
+			Color(ColorL2(0b10)).getValue(),
+			Color(ColorL2(0b11)).getValue(),
+		};
+		image.setColorTable(table);
+	}
+	else if (format == PixelFormat::AL2)
+	{
+		QVector<QRgb> table(16);
+		for(uint8_t i = 0; i < 16; i++)
+		{
+			Color c = Color(ColorAL2(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
@@ -68,14 +96,14 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 	else if (format == PixelFormat::L4)
 	{
 		QVector<QRgb> table(16);
-		for(int i = 0; i < 16; i++)
+		for(uint8_t i = 0; i < 16; i++)
 		{
 			Color c = Color(PixelColor<PixelFormat::L4>(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
 	}
-	else if (format == PixelFormat::L8)
+	else if (format == PixelFormat::L8 or format == PixelFormat::AL4)
 	{
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
@@ -86,7 +114,31 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 	}
 	else if (format == PixelFormat::RGB1)
 	{
-		QVector<QRgb> table{
+		QVector<QRgb> table
+		{
+			qRgb(0,0,0),
+			qRgb(0, 0, 0xff),
+			qRgb(0, 0xff, 0),
+			qRgb(0, 0xff, 0xff),
+			qRgb(0xff, 0, 0),
+			qRgb(0xff, 0, 0xff),
+			qRgb(0xff, 0xff, 0),
+			qRgb(0xff, 0xff, 0xff)
+		};
+		image.setColorTable(table);
+	}
+	else if (format == PixelFormat::ARGB1)
+	{
+		QVector<QRgb> table
+		{
+			qRgba(0,0,0,0),
+			qRgba(0, 0, 0xff, 0),
+			qRgba(0, 0xff, 0, 0),
+			qRgba(0, 0xff, 0xff, 0),
+			qRgba(0xff, 0, 0, 0),
+			qRgba(0xff, 0, 0xff, 0),
+			qRgba(0xff, 0xff, 0, 0),
+			qRgba(0xff, 0xff, 0xff, 0),
 			qRgb(0,0,0),
 			qRgb(0, 0, 0xff),
 			qRgb(0, 0xff, 0),

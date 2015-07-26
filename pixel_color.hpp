@@ -183,51 +183,9 @@ private:
 };
 
 using Color = PixelColor<PixelFormat::ARGB8>;
-
-template<>
-class PixelColor<PixelFormat::L2>
-{
-public:
-	using Type = uint8_t;
-	static constexpr uint8_t Depth = 2;
-#ifdef XPCC__OS_HOSTED
-	static constexpr uint8_t Bits = 8;
-#else
-	static constexpr uint8_t Bits = 2;
-#endif
+using ColorARGB8 = Color;
 
 
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value & 0x03) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(uint8_t(color.getRed()   * 0.2125 +
-					  color.getGreen() * 0.7154 +
-					  color.getBlue()  * 0.0721 ) >> 6) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(0xff000000 | value * 0x555555); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::L2> &other) const
-	{ return value == other.value; }
-
-	void
-	over(const PixelColor<PixelFormat::L2> &c)
-	{
-		value = c.value; // no blending possible
-	}
-
-private:
-	Type value;
-};
 
 template<>
 class PixelColor<PixelFormat::L4>
@@ -727,6 +685,7 @@ private:
 
 #include "pixel_color/pixel_color_rgb8.hpp"
 #include "pixel_color/pixel_color_l1.hpp"
+#include "pixel_color/pixel_color_l2.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 

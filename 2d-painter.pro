@@ -46,6 +46,7 @@ HEADERS  += mainwindow.h \
     painter.hpp \
     geometry/circle.hpp \
     pixel_color/pixel_color_rgb8.hpp \
-    pixel_color/pixel_color_l1.hpp
+    pixel_color/pixel_color_l1.hpp \
+    pixel_color/pixel_color_l2.hpp
 
 FORMS    += mainwindow.ui

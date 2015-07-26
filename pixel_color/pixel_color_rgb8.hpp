@@ -206,6 +206,8 @@ private:
 	};
 };
 
+using ColorRGB8 = PixelColor<PixelFormat::RGB8>;
+
 
 } // namespace ges
 

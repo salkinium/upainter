@@ -13,9 +13,9 @@ namespace ges
 
 
 template<>
-class PixelColor<PixelFormat::AL1>
+class PixelColor<PixelFormat::AL2>
 {
-	using ThisColor = PixelColor<PixelFormat::AL1>;
+	using ThisColor = PixelColor<PixelFormat::AL2>;
 public:
 	using Type = uint8_t;
 	using AlphaColor = ThisColor;
@@ -23,9 +23,9 @@ public:
 #ifdef XPCC__OS_HOSTED
 	static constexpr uint8_t Bits = 8;
 #else
-	static constexpr uint8_t Bits = 2;
+	static constexpr uint8_t Bits = 4;
 #endif
-	static constexpr PixelFormat Format = PixelFormat::AL1;
+	static constexpr PixelFormat Format = PixelFormat::AL2;
 
 	constexpr
 	PixelColor() :
@@ -33,19 +33,19 @@ public:
 
 	explicit constexpr
 	PixelColor(const Type value) :
-		value(value & 0b11) {}
+		value(value & 0xf) {}
 
 	constexpr
 	PixelColor(const Type grayscale, const Type alpha) :
-		value(((grayscale and alpha) ? 1 : 0) | (alpha ? 0b10 : 0)) {}
+		value(((alpha & 0b11) << 2) | ((grayscale & 0b11) * (alpha & 0b11) / 0b11)) {}
 
 	// Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
 	constexpr
 	PixelColor(const Color color) :
-		value(((color.getRed()   * 0.2125 +
-			   color.getGreen() * 0.7154 +
-			   color.getBlue()  * 0.0721 ) >= 127.5 ? 1 : 0) |
-			   (color.getAlpha() >= 127 ? 0b10 : 0)) {}
+		value((uint8_t(color.getRed()   * 0.2125 +
+					   color.getGreen() * 0.7154 +
+					   color.getBlue()  * 0.0721 ) >> 6) |
+					   ((color.getAlpha() & 0xc0) >> 4)) {}
 
 	constexpr Type
 	getValue() const
@@ -53,16 +53,16 @@ public:
 
 	constexpr Type
 	getGrayscale() const
-	{ return value & 0b01; }
+	{ return value & 0b11; }
 
 	constexpr Type
 	getAlpha() const
-	{ return (value & 0b10) >> 1; }
+	{ return (value & 0b1100) >> 2; }
 
 	explicit constexpr
 	operator Color() const
 	{
-		return Color((0xffffff * uint32_t(value & 0b01)) | (0x7F800000 * uint32_t(value & 0b10)));
+		return Color((0x555555 * (value & 0b11)) | (0x15400000 * (value & 0b1100)));
 	}
 
 	constexpr bool
@@ -87,11 +87,11 @@ public:
 
 	void
 	AoverB(const ThisColor &a)
-	{ compose(a, 1, 1 - a.getAlpha()); }
+	{ compose(a, 3, 3 - a.getAlpha()); }
 
 	void
 	BoverA(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 1); }
+	{ compose(a, 3 - getAlpha(), 3); }
 
 
 	void
@@ -105,30 +105,30 @@ public:
 
 	void
 	AoutB(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 0); }
+	{ compose(a, 3 - getAlpha(), 0); }
 
 	void
 	BoutA(const ThisColor &a)
-	{ compose(a, 0, 1 - a.getAlpha()); }
+	{ compose(a, 0, 3 - a.getAlpha()); }
 
 
 	void
 	AatopB(const ThisColor &a)
-	{ compose(a, getAlpha(), 1 - a.getAlpha()); }
+	{ compose(a, getAlpha(), 3 - a.getAlpha()); }
 
 	void
 	BatopA(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), a.getAlpha()); }
+	{ compose(a, 3 - getAlpha(), a.getAlpha()); }
 
 
 	void
 	Xor(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 1 - a.getAlpha()); }
+	{ compose(a, 3 - getAlpha(), 3 - a.getAlpha()); }
 
 
 	void
 	Plus(const ThisColor &a)
-	{ compose(a, 1, 1); }
+	{ compose(a, 3, 3); }
 
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
@@ -136,38 +136,42 @@ protected:
 	compose(const ThisColor &cA, const uint8_t fa, const uint8_t fb)
 	{
 		uint8_t a, g;
-		a = cA.getAlpha()     & fa;
-		g = cA.getGrayscale() & fa;
+		a = cA.getAlpha()     * fa;
+		g = cA.getGrayscale() * fa;
 
-		a += getAlpha()     & fb;
-		g += getGrayscale() & fb;
+		a += getAlpha()     * fb;
+		g += getGrayscale() * fb;
 
-		if (a > 1) a = 1;
-		if (g > 1) g = 1;
+		if (a >= 3*3) a = 3; else a /= 3;
+		if (g >= 3*3) g = 3; else g /= 3;
 
-		value = (a << 1) | g;
+		value = (a << 2) | g;
 	}
 
 private:
 	Type value;
 
 	friend
-	class PixelColor<PixelFormat::L1>;
+	class PixelColor<PixelFormat::L2>;
 };
 
-using ColorAL1 = PixelColor<PixelFormat::AL1>;
+using ColorAL2 = PixelColor<PixelFormat::AL2>;
 
 
 template<>
-class PixelColor<PixelFormat::L1>
+class PixelColor<PixelFormat::L2>
 {
-	using ThisColor = PixelColor<PixelFormat::L1>;
+	using ThisColor = PixelColor<PixelFormat::L2>;
 public:
 	using Type = uint8_t;
-	using AlphaColor = PixelColor<PixelFormat::AL1>;
+	using AlphaColor = PixelColor<PixelFormat::AL2>;
 	static constexpr uint8_t Depth = 1;
-	static constexpr uint8_t Bits = 1;
-	static constexpr PixelFormat Format = PixelFormat::L1;
+#ifdef XPCC__OS_HOSTED
+	static constexpr uint8_t Bits = 8;
+#else
+	static constexpr uint8_t Bits = 2;
+#endif
+	static constexpr PixelFormat Format = PixelFormat::L2;
 
 	constexpr
 	PixelColor() :
@@ -175,14 +179,14 @@ public:
 
 	explicit constexpr
 	PixelColor(const Type grayscale) :
-		value(grayscale & 0b1) {}
+		value(grayscale & 0b11) {}
 
 	// Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
 	constexpr
 	PixelColor(const Color color) :
-		value((color.getRed()   * 0.2125 +
-			   color.getGreen() * 0.7154 +
-			   color.getBlue()  * 0.0721 ) >= 127.5 ? 1 : 0) {}
+		value(uint8_t(color.getRed()   * 0.2125 +
+					  color.getGreen() * 0.7154 +
+					  color.getBlue()  * 0.0721 ) >> 6) {}
 
 	constexpr Type
 	getValue() const
@@ -195,7 +199,7 @@ public:
 	explicit constexpr
 	operator Color() const
 	{
-		return Color((value * 0xffffff) | 0xff000000);
+		{ return Color(0xff000000 | 0x555555 * value); }
 	}
 
 	constexpr bool
@@ -217,7 +221,7 @@ public:
 	{ value = a.value; }
 	inline void
 	A(const AlphaColor &a)
-	{ value = a.value & 0b1; }
+	{ value = a.value & 0b11; }
 
 	inline void
 	B(const ThisColor &)
@@ -228,34 +232,34 @@ public:
 
 
 
-	void	// compose(a, 1, 0);
+	void	// compose(a, 3, 0);
 	AoverB(const ThisColor &a)
 	{ value = a.value; }
 	void
 	AoverB(const AlphaColor &a)
-	{ if (a.value & 0b10) value = a.value & 0b1; }
+	{ compose(a, 3, 3 - a.getAlpha()); }
 
-	void	// compose(a, 0, 1);
+	void	// compose(a, 0, 3);
 	BoverA(const ThisColor &)
 	{ }
-	void	// compose(a, 0, 1);
+	void	// compose(a, 0, 3);
 	BoverA(const AlphaColor &)
 	{ }
 
 
-	void	// compose(a, 1, 0);
+	void	// compose(a, 3, 0);
 	AinB(const ThisColor &a)
 	{ value = a.value; }
-	void	// compose(a, 1, 0);
+	void	// compose(a, 3, 0);
 	AinB(const AlphaColor &a)
-	{ value = a.value & 0b1; }
+	{ value = a.value & 0b11; }
 
-	void	// compose(a, 0, 1);
+	void	// compose(a, 0, 3);
 	BinA(const ThisColor &)
 	{ }
 	void
 	BinA(const AlphaColor &a)
-	{ value = (getGrayscale() & a.getAlpha()); }
+	{ compose(a, 0, a.getAlpha()); }
 
 
 	void	// compose(a, 0, 0);
@@ -270,22 +274,22 @@ public:
 	{ value = 0; }
 	void
 	BoutA(const AlphaColor &a)
-	{ value = (getGrayscale() & ~a.getAlpha()); }
+	{ compose(a, 0, 3 - a.getAlpha()); }
 
 
-	void	// compose(a, 1, 0);
+	void	// compose(a, 3, 0);
 	AatopB(const ThisColor &a)
 	{ value = a.value; }
 	void
 	AatopB(const AlphaColor &a)
-	{ value = a.getGrayscale() | (getGrayscale() & ~a.getAlpha()); }
+	{ compose(a, 3, 3 - a.getAlpha()); }
 
-	void	// compose(a, 0, 1);
+	void	// compose(a, 0, 3);
 	BatopA(const ThisColor &)
 	{ }
 	void
 	BatopA(const AlphaColor &a)
-	{ value = (getGrayscale() & a.getAlpha()); }
+	{ compose(a, 0, a.getAlpha()); }
 
 
 	void	// compose(a, 0, 0);
@@ -293,25 +297,41 @@ public:
 	{ value = 0; }
 	void
 	Xor(const AlphaColor &a)
-	{ value = (getGrayscale() & ~a.getAlpha()); }
+	{ compose(a, 0, 3 - a.getAlpha()); }
 
 	void
 	Plus(const ThisColor &a)
-	{ value |= a.value; }
+	{
+		value += a.value;
+		if (value > 3) value = 3;
+	}
 	void
 	Plus(const AlphaColor &a)
-	{ value |= (a.value & 0b1); }
+	{
+		value += (a.value & 0b11);
+		if (value > 3) value = 3;
+	}
+
+protected:
+	// see Porter and Duff's "Compositing Digital Images"
+	void
+	compose(const AlphaColor &cA, const uint8_t fa, const uint8_t fb)
+	{
+		uint8_t r = cA.getGrayscale() * fa + getGrayscale() * fb;
+
+		if (r >= 3*3) r = 3; else r /= 3;
+
+		value = r;
+	}
 
 private:
 	Type value;
 };
 
-using ColorL1 = PixelColor<PixelFormat::L1>;
+using ColorL2 = PixelColor<PixelFormat::L2>;
 
 
 } // namespace ges
 
 } // namespace modm
-
-//#endif // MODM_GES_PIXEL_COLOR_RGB8_HPP
 

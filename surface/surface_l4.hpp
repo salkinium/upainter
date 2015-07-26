@@ -12,6 +12,7 @@ namespace ges
 {
 
 #ifndef XPCC__OS_HOSTED
+
 template<>
 class Surface<PixelFormat::L4>
 {
@@ -132,6 +133,7 @@ protected:
 	template < PixelFormat F >
 	friend class Painter;
 };
+
 #endif
 
 } // namespace ges

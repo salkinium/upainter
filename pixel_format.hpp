@@ -81,6 +81,7 @@ bitsPerPixel(PixelFormat format)
 			return 32;
 	}
 }
+
 } // namespace ges
 
 } // namespace modm
