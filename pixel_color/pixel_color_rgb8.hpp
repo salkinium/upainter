@@ -1,5 +1,6 @@
-#ifndef MODM_GES_PIXEL_COLOR_RGB8_HPP
-#define MODM_GES_PIXEL_COLOR_RGB8_HPP
+#ifndef MODM_GES_PIXEL_COLOR_HPP
+#	error	"Don't include this file directly, use 'pixel_color.hpp' instead!"
+#endif
 
 #include <stdint.h>
 #include "pixel_format.hpp"
@@ -15,23 +16,27 @@ class PixelColor<PixelFormat::RGB8>
 {
 	using ThisColor = PixelColor<PixelFormat::RGB8>;
 public:
-	using AlphaColor = PixelColor<PixelFormat::ARGB8>;
 	using Type = uint32_t;
+	using AlphaColor = PixelColor<PixelFormat::ARGB8>;
 	static constexpr uint8_t Depth = 24;
 	static constexpr uint8_t Bits = 32;
 	static constexpr PixelFormat Format = PixelFormat::RGB8;
 
+	constexpr
+	PixelColor() :
+		parts{0,0,0} {}
+
 	explicit constexpr
 	PixelColor(const Type value) :
-		value(0xff000000 | value) {}
+		parts{uint8_t(value), uint8_t(value >> 8), uint8_t(value >> 16)} {}
 
 	constexpr
 	PixelColor(const Color &color) :
-		value(color.getValue() | 0xff000000) {}
+		parts{color.getRed(), color.getGreen(), color.getBlue()} {}
 
 	constexpr Type
 	getValue() const
-	{ return value; }
+	{ return value & 0xffffff; }
 
 	constexpr uint8_t
 	getRed() const
@@ -51,26 +56,27 @@ public:
 
 	explicit constexpr
 	operator Color() const
-	{ return Color(value); }
+	{ return Color(getValue() | 0xff000000); }
 
 	constexpr bool
 	operator== (const ThisColor &other) const
-	{ return value == other.value; }
+	{ return getValue() == other.getValue(); }
 
+	// Porter and Duff's compositing operations
 	void
 	Clear(const ThisColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 	void
 	Clear(const AlphaColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 
 
 	inline void
 	A(const ThisColor &a)
-	{ value = a.value; }
+	{ parts[0] = a.parts[0]; parts[1] = a.parts[1]; parts[2] = a.parts[2]; }
 	inline void
 	A(const AlphaColor &a)
-	{ value = a.getValue() | 0xff000000; }
+	{ A(reinterpret_cast<const ThisColor &>(a)); }
 
 	inline void
 	B(const ThisColor &)
@@ -83,7 +89,7 @@ public:
 
 	void	// compose(a, 255, 0);
 	AoverB(const ThisColor &a)
-	{ value = a.value; }
+	{ A(a); }
 	void
 	AoverB(const AlphaColor &a)
 	{ compose(a, 255, 255 - a.getAlpha()); }
@@ -98,10 +104,10 @@ public:
 
 	void	// compose(a, 255, 0);
 	AinB(const ThisColor &a)
-	{ value = a.value; }
+	{ A(a); }
 	void	// compose(a, 255, 0);
 	AinB(const AlphaColor &a)
-	{ value = a.getValue(); }
+	{ A(reinterpret_cast<const ThisColor &>(a)); }
 
 	void	// compose(a, 0, 255);
 	BinA(const ThisColor &)
@@ -113,14 +119,14 @@ public:
 
 	void	// compose(a, 0, 0);
 	AoutB(const ThisColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 	void	// compose(a, 0, 0);
 	AoutB(const AlphaColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 
 	void	// compose(a, 0, 0);
 	BoutA(const ThisColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 	void
 	BoutA(const AlphaColor &a)
 	{ compose(a, 0, 255 - a.getAlpha()); }
@@ -128,7 +134,7 @@ public:
 
 	void	// compose(a, 255, 0);
 	AatopB(const ThisColor &a)
-	{ value = a.value; }
+	{ A(a); }
 	void
 	AatopB(const AlphaColor &a)
 	{ compose(a, 255, 255 - a.getAlpha()); }
@@ -143,7 +149,7 @@ public:
 
 	void	// compose(a, 0, 0);
 	Xor(const ThisColor &)
-	{ value = 0xff000000; }
+	{ *this = PixelColor(); }
 	void
 	Xor(const AlphaColor &a)
 	{ compose(a, 0, 255 - a.getAlpha()); }
@@ -172,7 +178,7 @@ public:
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
 	void
-	compose(const PixelColor<PixelFormat::ARGB8> &cA, const uint8_t fa, const uint8_t fb)
+	compose(const AlphaColor &cA, const uint8_t fa, const uint8_t fb)
 	{
 		uint32_t r, g, b;
 		r = cA.getRed()   * uint32_t(fa);
@@ -196,7 +202,7 @@ private:
 	union
 	{
 		uint32_t value;
-		uint8_t parts[4];
+		uint8_t parts[3];
 	};
 };
 
@@ -205,5 +211,4 @@ private:
 
 } // namespace modm
 
-#endif // MODM_GES_PIXEL_COLOR_RGB8_HPP
 

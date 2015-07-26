@@ -37,7 +37,7 @@ public:
 	static constexpr uint8_t Bits = 32;
 	static constexpr PixelFormat Format = PixelFormat::ARGB8;
 
-	explicit constexpr
+	constexpr
 	PixelColor() :
 		composite(0) {}
 
@@ -84,7 +84,6 @@ public:
 
 
 	// Porter and Duff's compositing operations
-
 	void
 	Clear(const ThisColor &)
 	{ composite = 0; }
@@ -184,57 +183,6 @@ private:
 };
 
 using Color = PixelColor<PixelFormat::ARGB8>;
-
-template<>
-class PixelColor<PixelFormat::L1>
-{
-	using PColor = PixelColor<PixelFormat::L1>;
-public:
-	using Type = uint8_t;
-	static constexpr uint8_t Depth = 1;
-	static constexpr uint8_t Bits = 1;
-
-	explicit constexpr
-	PixelColor(const Type grayscale, const Type alpha) :
-		value((grayscale ? 1 : 0) | (alpha >= 127 ? 0b10 : 0)) {}
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value & 0x03) {}
-
-	// Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
-	constexpr
-	PixelColor(const Color color) :
-		value((color.getRed()   * 0.2125 +
-			   color.getGreen() * 0.7154 +
-			   color.getBlue()  * 0.0721 ) >= 127 ? 1 : 0 |
-			   (color.getAlpha() >= 127 ? 0b10 : 0)) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	constexpr Type
-	getGrayscale() const
-	{ return value & 0b01; }
-
-	constexpr Type
-	getAlpha() const
-	{ return value & 0b10; }
-
-	explicit constexpr
-	operator Color() const
-	{
-		return Color(((value & 0b01) * 0xffffff) | ((value & 0b10) * 0x7F800000));
-	}
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::L1> &other) const
-	{ return value == other.value; }
-
-private:
-	Type value;
-};
 
 template<>
 class PixelColor<PixelFormat::L2>
@@ -778,6 +726,7 @@ private:
 } // namespace modm
 
 #include "pixel_color/pixel_color_rgb8.hpp"
+#include "pixel_color/pixel_color_l1.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 

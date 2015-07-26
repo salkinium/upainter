@@ -24,7 +24,6 @@ class Surface
 	using BufferType = typename PixelColor<Format>::Type;
 public:
 	using NativeColor = PixelColor<Format>;
-	using AlphaColor = typename PixelColor<Format>::AlphaColor;
 
 	template< uint16_t Width, uint16_t Height >
 	using Buffer = PixelBuffer<Width, Height, Format>;

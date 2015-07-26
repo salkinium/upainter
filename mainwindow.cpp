@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		Rect clip = Rect(40 + int(-l/2) % 100, 20 +int(-l/4)%50, 60, 40);
 		painter.fillRect(clip, Color::White);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
-		painter.drawRect(outline, fromQColor(offset, 1, 0.5,0.5), Rect(20, 10, 127-40, 63-20), &Painter<Format>::NativeColor::Plus);
+		painter.drawRect(outline, fromQColor(offset, 1, 0.5,0.5), Painter<Format>::Plus, Rect(20, 10, 127-40, 63-20));
 		l += 0.2;
 
 		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
 
 		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
-		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 128), &Painter<Format>::NativeColor::AoverB);
+		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 128), Painter<Format>::AoverB);
 
 		qDisplay.repaint();
 	});

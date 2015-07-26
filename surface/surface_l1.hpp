@@ -73,7 +73,7 @@ public:
 		std::memset(buffer, color.getValue() * 0xff, std::size_t(width) * height / 8);
 	}
 
-	void
+	inline void
 	setPixel(uint16_t x, uint16_t y, NativeColor color)
 	{
 		if (color.getValue() == 0) {
@@ -81,6 +81,24 @@ public:
 		} else {
 			buffer[(y * width + x) / 8] |=  (1 << (x & 0x07));
 		}
+	}
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	{
+		NativeColor pixel(getPixel(x, y));
+		(pixel.*composition)(color);
+		setPixel(x, y, pixel);
+	}
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(const Point p, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	{
+		NativeColor pixel(getPixel(p));
+		(pixel.*composition)(color);
+		setPixel(p, pixel);
 	}
 
 	inline void
@@ -101,18 +119,15 @@ public:
 		setPixel(p, NativeColor(0));
 	}
 
-	NativeColor
+	inline NativeColor
 	getPixel(uint16_t x, uint16_t y) const
 	{
-		if (x < width and y < height)
-		{
-			if (buffer[(y * width + x) / 8] & (1 << (x & 0x07)))
-				return NativeColor(1);
-		}
+		if (buffer[(y * width + x) / 8] & (1 << (x & 0x07)))
+			return NativeColor(1);
 		return NativeColor(0);
 	}
 
-	NativeColor
+	inline NativeColor
 	getPixel(Point p) const
 	{
 		return getPixel(p.getX(), p.getY());
