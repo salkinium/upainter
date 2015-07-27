@@ -13,7 +13,7 @@ namespace Ui {
 class MainWindow;
 }
 
-static constexpr PixelFormat Format = PixelFormat::AL2;
+static constexpr PixelFormat Format = PixelFormat::L4;
 
 class MainWindow : public QMainWindow
 {

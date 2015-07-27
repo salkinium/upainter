@@ -19,7 +19,11 @@ public:
 	using Type = uint32_t;
 	using AlphaColor = PixelColor<PixelFormat::ARGB8>;
 	static constexpr uint8_t Depth = 24;
+#ifdef XPCC__OS_HOSTED
 	static constexpr uint8_t Bits = 32;
+#else
+	static constexpr uint8_t Bits = 24;
+#endif
 	static constexpr PixelFormat Format = PixelFormat::RGB8;
 
 	constexpr
