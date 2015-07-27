@@ -601,6 +601,7 @@ private:
 #include "pixel_color/pixel_color_l1.hpp"
 #include "pixel_color/pixel_color_l2.hpp"
 #include "pixel_color/pixel_color_l4.hpp"
+#include "pixel_color/pixel_color_l8.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 

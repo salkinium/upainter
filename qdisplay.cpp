@@ -32,6 +32,7 @@ toQImageFormat(PixelFormat format)
 		case PixelFormat::L8:
 			return QImage::Format_Indexed8;
 
+		case PixelFormat::AL8:
 		case PixelFormat::ARGB4:
 			return QImage::Format_ARGB4444_Premultiplied;
 
