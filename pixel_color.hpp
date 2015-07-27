@@ -187,49 +187,6 @@ using ColorARGB8 = Color;
 
 
 template<>
-class PixelColor<PixelFormat::RGB1>
-{
-public:
-	using Type = uint8_t;
-	static constexpr uint8_t Depth = 3;
-	static constexpr uint8_t Bits = 8;
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value & 0b111) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(((color.getRed() & 0x80) >> 5) |
-			  ((color.getGreen() & 0x80) >> 6) |
-			  (color.getBlue() >> 7)) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(0xff000000 |
-				   ((value & 0b100) * 0x3fc000) |
-				   ((value & 0b010) * 0x7f80) |
-				   ((value & 0b001) * 0xff)); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::RGB1> &other) const
-	{ return value == other.value; }
-
-	void
-	over(const PixelColor<PixelFormat::RGB1> &c)
-	{
-		value = c.value; // no blending possible
-	}
-
-private:
-	Type value;
-};
-
-template<>
 class PixelColor<PixelFormat::RGB332>
 {
 public:
@@ -602,6 +559,7 @@ private:
 #include "pixel_color/pixel_color_l2.hpp"
 #include "pixel_color/pixel_color_l4.hpp"
 #include "pixel_color/pixel_color_l8.hpp"
+#include "pixel_color/pixel_color_rgb1.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 

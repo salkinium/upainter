@@ -128,7 +128,7 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 	{
 		QVector<QRgb> table
 		{
-			qRgb(0,0,0),
+			qRgb(0, 0, 0),
 			qRgb(0, 0, 0xff),
 			qRgb(0, 0xff, 0),
 			qRgb(0, 0xff, 0xff),
@@ -143,7 +143,7 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 	{
 		QVector<QRgb> table
 		{
-			qRgba(0,0,0,0),
+			qRgba(0, 0, 0, 0),
 			qRgba(0, 0, 0xff, 0),
 			qRgba(0, 0xff, 0, 0),
 			qRgba(0, 0xff, 0xff, 0),
@@ -151,7 +151,7 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 			qRgba(0xff, 0, 0xff, 0),
 			qRgba(0xff, 0xff, 0, 0),
 			qRgba(0xff, 0xff, 0xff, 0),
-			qRgb(0,0,0),
+			qRgb(0, 0, 0),
 			qRgb(0, 0, 0xff),
 			qRgb(0, 0xff, 0),
 			qRgb(0, 0xff, 0xff),

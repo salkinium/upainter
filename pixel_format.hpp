@@ -26,7 +26,7 @@ PixelFormat
 	AL8 = 7,
 
 	RGB332 = 8,
-	ARGB1232 = 9,
+//	ARGB1232 = 9,	// no, use value 0 in RGB332 as transparent
 
 	ARGB2 = 10,
 	ARGB4 = 11,
@@ -66,7 +66,6 @@ bitsPerPixel(PixelFormat format)
 		case PixelFormat::AL4:
 		case PixelFormat::L8:
 		case PixelFormat::RGB332:
-		case PixelFormat::ARGB1232:
 		case PixelFormat::ARGB2:
 			return 8;
 
