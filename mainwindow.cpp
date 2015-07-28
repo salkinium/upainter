@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
 
 		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
-		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 63), Painter<Format>::AoverB);
+		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 64), Painter<Format>::AoverB);
 
 		qDisplay.repaint();
 	});

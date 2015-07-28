@@ -34,6 +34,10 @@ public:
 	PixelColor(const Type value) :
 		parts{uint8_t(value), uint8_t(value >> 8), uint8_t(value >> 16)} {}
 
+	explicit constexpr
+	PixelColor(const uint8_t red, const uint8_t green, const uint8_t blue) :
+		parts{red, green, blue} {}
+
 	constexpr
 	PixelColor(const Color &color) :
 		parts{color.getRed(), color.getGreen(), color.getBlue()} {}
@@ -53,10 +57,6 @@ public:
 	constexpr uint8_t
 	getBlue() const
 	{ return parts[2]; }
-
-	constexpr uint8_t
-	getAlpha() const
-	{ return 255; }
 
 	explicit constexpr
 	operator Color() const

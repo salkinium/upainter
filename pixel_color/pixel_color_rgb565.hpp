@@ -143,8 +143,8 @@ protected:
 	void
 	compose(const ThisColor &cA, const bool fa, const bool fb)
 	{
-		uint16_t a = 0, r = 0, g = 0;
-		uint8_t b = 0;
+		uint_least16_t a = 0, r = 0, g = 0;
+		uint_least8_t b = 0;
 
 		if (fa)
 		{
@@ -175,7 +175,6 @@ protected:
 	{
 		return ((value & 0x7fe0) << 1) | ((value & 0x200) >> 4) | (value & 0x1f);
 	}
-
 
 private:
 	union
@@ -280,7 +279,7 @@ public:
 	{ value = a.value; }
 	void
 	AoverB(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 1, !(a.parts[1] & 0x80)); }
+	{ compose(a, 1, !(a.parts[1] & 0x80)); }
 
 	void	// compose(a, 0, 1);
 	BoverA(const ThisColor &)
@@ -302,7 +301,7 @@ public:
 	{ }
 	void
 	BinA(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 0, (a.parts[1] & 0x80)); }
+	{ compose(a, 0, (a.parts[1] & 0x80)); }
 
 
 	void	// compose(a, 0, 0);
@@ -317,7 +316,7 @@ public:
 	{ value = 0; }
 	void
 	BoutA(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 0, !(a.parts[1] & 0x80)); }
+	{ compose(a, 0, !(a.parts[1] & 0x80)); }
 
 
 	void	// compose(a, 1, 0);
@@ -325,14 +324,14 @@ public:
 	{ value = a.value; }
 	void
 	AatopB(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 1, !(a.parts[1] & 0x80)); }
+	{ compose(a, 1, !(a.parts[1] & 0x80)); }
 
 	void	// compose(a, 0, 1);
 	BatopA(const ThisColor &)
 	{ }
 	void
 	BatopA(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 0, (a.parts[1] & 0x80)); }
+	{ compose(a, 0, (a.parts[1] & 0x80)); }
 
 
 	void	// compose(a, 0, 0);
@@ -340,29 +339,43 @@ public:
 	{ value = 0; }
 	void
 	Xor(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 0, !(a.parts[1] & 0x80)); }
+	{ compose(a, 0, !(a.parts[1] & 0x80)); }
 
 	void
 	Plus(const ThisColor &a)
-	{ compose(a, 1, 1); }
+	{
+		uint32_t r = a.value & 0xf800;
+		uint_least16_t g = a.value & 0x7e0;
+		uint_least8_t b = a.value & 0x1f;
+
+		r += value & 0xf800;
+		g += value & 0x7e0;
+		b += value & 0x1f;
+
+		if (r > 0xf800) r = 0xf800;
+		if (g > 0x7e0)  g = 0x7e0;
+		if (b > 0x1f)   b = 0x1f;
+
+		value = r | g | b;
+	}
 	void
 	Plus(const AlphaColor &a)
-	{ compose(ThisColor(a.get565()), 1, 1); }
+	{ compose(a, 1, 1); }
 
 
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
 	void
-	compose(const ThisColor &cA, const bool fa, const bool fb)
+	compose(const AlphaColor &cA, const bool fa, const bool fb)
 	{
 		uint32_t r = 0;
-		uint16_t g = 0;
-		uint8_t b = 0;
+		uint_least16_t g = 0;
+		uint_least8_t b = 0;
 
 		if (fa)
 		{
-			r = cA.value & 0xf800;
-			g = cA.value & 0x7e0;
+			r = (cA.value & 0x7c00) << 1;
+			g = ((cA.value & 0x3e0) << 1) | ((cA.value & 0x200) >> 4);
 			b = cA.value & 0x1f;
 		}
 
