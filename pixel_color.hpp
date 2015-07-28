@@ -165,6 +165,17 @@ protected:
 		if (g >= 255*255) g = 255; else g /= 255;
 		if (b >= 255*255) b = 255; else b /= 255;
 
+		// this is an alternative manual implementation of division by 255
+		// for details see "Image Compositing Fundamentals Technical Memo 4"
+		// by Alvy Ray Smith, August 15, 1995
+		// I would be surprised if the compiler did not optimize the division
+		// by a constant away using multiplication with overflow
+		// however on Cortex-M0/M0+/M3 this might still be faster (have no 1-cycle MAC).
+//		if (a >= 255*255) a = 255; else { a += 0x80; a = (((a >> 8) + a) >> 8); }	// a /= 255
+//		if (r >= 255*255) r = 255; else { r += 0x80; r = (((r >> 8) + r) >> 8); }	// r /= 255
+//		if (g >= 255*255) g = 255; else { g += 0x80; g = (((g >> 8) + g) >> 8); }	// g /= 255
+//		if (b >= 255*255) b = 255; else { b += 0x80; b = (((b >> 8) + b) >> 8); }	// b /= 255
+
 		parts[0] = r;
 		parts[1] = g;
 		parts[2] = b;
