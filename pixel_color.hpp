@@ -229,48 +229,6 @@ private:
 	Type value;
 };
 
-template<>
-class PixelColor<PixelFormat::RGB565>
-{
-public:
-	using Type = uint16_t;
-	static constexpr uint8_t Depth = 16;
-	static constexpr uint8_t Bits = 16;
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(((color.getRed() & 0xf8) << 8) |
-			  ((color.getGreen() & 0xfc) << 3) |
-			  (color.getBlue() >> 3)) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(0xff000000 |
-				   ((value & 0xf800) << 8) | ((value & 0xe000) << 3) |
-				   ((value & 0x7e0) << 5) | ((value & 0x600) >> 1) |
-				   ((value & 0x1f) * 0x21) >> 2); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::RGB565> &other) const
-	{ return value == other.value; }
-
-	void
-	over(const PixelColor<PixelFormat::RGB565> &c)
-	{
-		value = c.value; // no blending possible
-	}
-
-private:
-	Type value;
-};
 
 template<>
 class PixelColor<PixelFormat::ARGB2>
@@ -502,64 +460,18 @@ private:
 	Type value;
 };
 
-template<>
-class PixelColor<PixelFormat::ARGB1555>
-{
-public:
-	using Type = uint16_t;
-	static constexpr uint8_t Depth = 15;
-	static constexpr uint8_t Bits = 16;
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(((color.getAlpha() & 0x80) << 8) |
-			  ((color.getRed() & 0xf8) << 7) |
-			  ((color.getGreen() & 0xf8) << 2) |
-			  (color.getBlue() >> 3)) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(((value & 0x8000) ? 0xff000000 : 0) |
-				   ((value & 0x7c00) << 9) | ((value & 0x7000) << 4) |
-				   ((value & 0x3e0) << 6) | ((value & 0x380) << 1) |
-				   ((value & 0x1f) * 0x21) >> 2); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::ARGB1555> &other) const
-	{ return value == other.value; }
-
-	void
-	over(const PixelColor<PixelFormat::ARGB1555> &c)
-	{
-		if (c.value & 0x8000)
-		{
-			value = c.value;
-		}
-	}
-
-private:
-	Type value;
-};
-
 
 } // namespace ges
 
 } // namespace modm
 
-#include "pixel_color/pixel_color_rgb8.hpp"
 #include "pixel_color/pixel_color_l1.hpp"
 #include "pixel_color/pixel_color_l2.hpp"
 #include "pixel_color/pixel_color_l4.hpp"
 #include "pixel_color/pixel_color_l8.hpp"
 #include "pixel_color/pixel_color_rgb1.hpp"
+#include "pixel_color/pixel_color_rgb565.hpp"
+#include "pixel_color/pixel_color_rgb8.hpp"
 
 #endif // MODM_GES_PIXEL_COLOR_HPP
 

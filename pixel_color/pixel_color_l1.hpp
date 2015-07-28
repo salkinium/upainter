@@ -36,7 +36,7 @@ public:
 		value(value & 0b11) {}
 
 	constexpr
-	PixelColor(const Type grayscale, const Type alpha) :
+	PixelColor(const uint8_t grayscale, const bool alpha) :
 		value(((grayscale and alpha) ? 1 : 0) | (alpha ? 0b10 : 0)) {}
 
 	// Luminence: (0.2125 * red) + (0.7154 * green) + (0.0721 * blue)
@@ -45,7 +45,7 @@ public:
 		value(((color.getRed()   * 0.2125 +
 			   color.getGreen() * 0.7154 +
 			   color.getBlue()  * 0.0721 ) >= 127.5 ? 1 : 0) |
-			   (color.getAlpha() >= 127 ? 0b10 : 0)) {}
+			   ((color.getAlpha() & 0x80) >> 6)) {}
 
 	constexpr Type
 	getValue() const
