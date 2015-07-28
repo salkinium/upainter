@@ -345,121 +345,6 @@ private:
 	Type value;
 };
 
-template<>
-class PixelColor<PixelFormat::ARGB4>
-{
-public:
-	using Type = uint16_t;
-	static constexpr uint8_t Depth = 12;
-	static constexpr uint8_t Bits = 16;
-
-	explicit constexpr
-	PixelColor(const Type value) :
-		value(value) {}
-
-	constexpr
-	PixelColor(const Color color) :
-		value(((color.getAlpha() & 0xf0) << 8) |
-			  ((color.getRed() & 0xf0) << 4) |
-			  (color.getGreen() & 0xf0) |
-			  (color.getBlue() >> 4)) {}
-
-	constexpr Type
-	getValue() const
-	{ return value; }
-
-	constexpr uint8_t
-	getRed() const
-	{ return (value & 0x0f); }
-
-	constexpr uint8_t
-	getGreen() const
-	{ return (value & 0xf0) >> 4; }
-
-	constexpr uint8_t
-	getBlue() const
-	{ return (value & 0xf00) >> 8; }
-
-	constexpr uint8_t
-	getAlpha() const
-	{ return (value & 0xf000) >> 12; }
-
-	explicit constexpr
-	operator Color() const
-	{ return Color(((value & 0xf000) * 0x11000) |
-				   ((value & 0x0f00) * 0x1100) |
-				   ((value & 0x00f0) * 0x110) |
-				   ((value & 0x000f) * 0x11)); }
-
-	constexpr bool
-	operator== (const PixelColor<PixelFormat::ARGB4> &other) const
-	{ return value == other.value; }
-
-	void
-	over(const PixelColor<PixelFormat::ARGB4> &c)
-	{
-		if ((c.value & 0xf000) == 0xf000)
-		{
-			value = c.value;
-			return;
-		}
-
-		{
-			// this class is B, other color is A
-			uint16_t a, r, g, b;
-			a = c.getAlpha();
-
-			if ((value & 0xf000) == 0xf000)
-			{
-				// C = alphaA * A + (1 - alphaA) * B
-				r = c.getRed() * a;	// normalization by div 3 done later
-				g = c.getGreen() * a;
-				b = c.getBlue() * a;
-
-				r += getRed() * (15 - a);	// normalization by div 3 done later
-				g += getGreen() * (15 - a);
-				b += getBlue() * (15 - a);
-
-				// normalize all values!
-				r /= 15;
-				g /= 15;
-				b /= 15;
-
-				value = 0xf000;
-			}
-			else
-			{
-				// C = (alphaA * A + (1 - alphaA) * alphaB * B) / alphaC
-				r = c.getRed() * a * 15;	// normalization done by alphaC!
-				g = c.getGreen() * a * 15;
-				b = c.getBlue() * a * 15;
-				uint8_t aa = getAlpha();
-
-				// alphc = alphaA + (1 - alphaA) * alphaB
-				uint8_t c = a * 15 + (15 - a) * aa;
-
-				r += getRed() * aa * (15 - a);
-				g += getGreen() * aa * (15 - a);
-				b += getBlue() * aa * (15 - a);
-
-				r /= c;
-				g /= c;
-				b /= c;
-				c /= 15;	// normalize c
-
-				// write back
-				value = (c << 12);
-			}
-
-			// write back
-			value |= ((b << 8) | (g << 4) | r);
-		}
-	}
-
-private:
-	Type value;
-};
-
 
 } // namespace ges
 
@@ -470,6 +355,7 @@ private:
 #include "pixel_color/pixel_color_l4.hpp"
 #include "pixel_color/pixel_color_l8.hpp"
 #include "pixel_color/pixel_color_rgb1.hpp"
+#include "pixel_color/pixel_color_rgb4.hpp"
 #include "pixel_color/pixel_color_rgb565.hpp"
 #include "pixel_color/pixel_color_rgb8.hpp"
 
