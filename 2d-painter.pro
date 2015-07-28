@@ -53,6 +53,7 @@ HEADERS  += mainwindow.h \
     pixel_color/pixel_color_rgb1.hpp \
     pixel_color/pixel_color_rgb565.hpp \
     pixel_color/pixel_color_rgb4.hpp \
-    pixel_color/pixel_color_rgb332.hpp
+    pixel_color/pixel_color_rgb332.hpp \
+    painter_impl.hpp
 
 FORMS    += mainwindow.ui
