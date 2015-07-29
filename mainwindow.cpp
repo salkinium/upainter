@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
 	surface(buffer), painter(surface),
-	qDisplay(surface), offset(0)
+	qDisplay(surface), offset(0.7)
 {
 	ui->setupUi(this);
 
@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
 		offset += 0.0007135;
 		if (offset > 1) offset -= 1;
 
-//		surface.clear(Color::White);
+		/*
+		surface.clear(Color::White);
+		/*/
 		for (int ww = 0; ww < surface.getWidth(); ww++)
 		{
 			for (int hh = 0; hh < surface.getHeight(); hh++)
@@ -44,20 +46,21 @@ MainWindow::MainWindow(QWidget *parent) :
 				qreal l = 1 - hh / qreal(surface.getHeight());
 				qreal h = (ww / qreal(surface.getWidth()) + offset);
 				if (h > 1) h -= 1;
-				Color color = fromQColor(h, 1, l, 0.8);
+				Color color = fromQColor(h, 1, l, 1);
 				surface.setPixel(ww, hh, color);
 //				surface.compositePixel(ww, hh, PixelColor<Format>::AlphaColor(color), Painter<Format>::AoverB);
 			}
 		}
+		//*/
 
 		qreal r = offset * 10;
 		static float l = 10;
+		l += 0.2;
 
 		Rect clip = Rect(40 + int(-l/2) % 100, 20 +int(-l/4)%50, 60, 40);
 		painter.fillRect(clip, Color::White);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
 		painter.drawRect(outline, fromQColor(offset, 1, 0.5, 0.5), Painter<Format>::Plus, Rect(20, 10, 127-40, 63-20));
-		l += 0.2;
 
 		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
 
@@ -74,6 +77,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
 		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 64), Painter<Format>::AoverB);
+
+		Ellipse el(Point(5, 7), Size(abs(62 * sin(r*1.1))*2, abs(40 * cos(r))*2));
+		painter.drawEllipse(el, Color(255, 0, 255, 82), Painter<Format>::AoverB);
+		painter.drawEllipse(el, Color::Red, clip);
+
+		Ellipse el2(Point(60, 20), Size(abs(62 * sin(r)), abs(42 * sin(r))+1));
+		painter.fillEllipse(el2, Color(255, 0, 0, 82), Painter<Format>::AoverB);
 
 		qDisplay.repaint();
 	});

@@ -3,6 +3,7 @@
 
 #include "point.hpp"
 #include "rect.hpp"
+#include "ellipse.hpp"
 
 namespace modm
 {
@@ -43,6 +44,12 @@ public:
 	getBounds() const
 	{
 		return Rect(origin - Point(radius, radius), Size(radius*2, radius*2));
+	}
+
+	inline Ellipse
+	getEllipse() const
+	{
+		return Ellipse(origin.getX() - radius, origin.getY() - radius, radius*2, radius*2);
 	}
 
 

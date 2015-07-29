@@ -220,35 +220,62 @@ modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor &color, 
 	}
 }
 
-/*
+
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawEllipse(int16_t xm, int16_t ym, int16_t a, int16_t b, NativeColor c)
+modm::ges::Painter<Format>::drawRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
 {
-	uint32_t x = -a, y = 0;					// II. quadrant from bottom left to top right
-	uint32_t e2 = b, dx = (1+2*x)*e2*e2;	// error increment
-	uint32_t dy = x*x, err = dx+dy;			// error of 1.step
+	clip = surface.clip(clip);
+	// don't even bother if rect is not in clip area
+	if (clip.isEmpty() or not clip.intersects(rectangle)) return;
 
-	do {
-		surface.setPixel(xm-x, ym+y, c);	//   I. Quadrant
-		surface.setPixel(xm+x, ym+y, c);	//  II. Quadrant
-		surface.setPixel(xm+x, ym-y, c);	// III. Quadrant
-		surface.setPixel(xm-x, ym-y, c);	//  IV. Quadrant
-		e2 = 2*err;
-		if (e2 >= dx) { x++; err += dx += 2*int32_t(b)*b; }	// x step
-		if (e2 <= dy) { y++; err += dy += 2*int32_t(a)*a; }	// y step
+//		int16_t cl = clip.getLeft();	// save some stack
+//		int16_t ct = clip.getTop();		// save some stack
+	int16_t cr = clip.getRight();
+	int16_t cb = clip.getBottom();
+
+//		int16_t rl = rectangle.getLeft();	// save some stack
+//		int16_t rt = rectangle.getTop();	// save some stack
+	int16_t rr = rectangle.getRight();
+	int16_t rb = rectangle.getBottom();
+
+	int16_t ml = xpcc::max(rectangle.getLeft(), clip.getLeft());
+	int16_t mt = clip.getTop();	// decided at top line
+	int16_t mr = xpcc::min(rr, cr);
+	int16_t mb = cb;			// decided at bottom line
+
+	if (clip.getTop() <= rectangle.getTop()) {	// top line
+		mt = rectangle.getTop();
+		drawHorizontalLine(rectangle.getTop(), ml+1, mr-1, color, composition);
 	}
-	while (x <= 0);
 
-	// too early stop for flat ellipses with a=1
-	while (y++ < b)
-	{
-		// -> finish tip of ellipse
-		surface.setPixel(xm, ym+y, c);
-		surface.setPixel(xm, ym-y, c);
+	if (rb <= cb) {	// bottom line
+		mb = rb;
+		drawHorizontalLine(rb, ml+1, mr-1, color, composition);
+	}
+
+	if (clip.getLeft() <= rectangle.getLeft()) {	// left line
+		drawVerticalLine(rectangle.getLeft(), mt, mb, color, composition);
+	}
+
+	if (rr <= cr) {	// right line
+		drawVerticalLine(rr, mt, mb, color, composition);
 	}
 }
-*/
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::fillRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+{
+	clip = rectangle.intersected(surface.clip(clip));
+	// there is no need to test for isEmpty() !
+
+	for (int16_t yy = clip.getTop(); yy <= clip.getBottom(); yy++)
+	{
+		drawHorizontalLine(yy, clip.getLeft(), clip.getRight(), color, composition);
+	}
+}
+
 
 template< modm::ges::PixelFormat Format >
 void
@@ -287,14 +314,10 @@ modm::ges::Painter<Format>::drawCircle(const Circle &circle, const AlphaColor &c
 		 * I haven't found a good arc rasterization algorithm based on this one yet,
 		 * so this uses the cheesy guard band clipping way for every pixel.
 		 */
-		if (clip.contains(circle.getX() - x, circle.getY() + y))
-			surface.compositePixel(circle.getX() - x, circle.getY() + y, color, composition);	//   I. Quadrant +x +y
-		if (clip.contains(circle.getX() - y, circle.getY() - x))
-			surface.compositePixel(circle.getX() - y, circle.getY() - x, color, composition);	//  II. Quadrant -x +y
-		if (clip.contains(circle.getX() + x, circle.getY() - y))
-			surface.compositePixel(circle.getX() + x, circle.getY() - y, color, composition);	// III. Quadrant -x -y
-		if (clip.contains(circle.getX() + y, circle.getY() + x))
-			surface.compositePixel(circle.getX() + y, circle.getY() + x, color, composition);	//  IV. Quadrant +x -y
+		if (clip.contains(circle.getX() - x, circle.getY() + y)) surface.compositePixel(circle.getX() - x, circle.getY() + y, color, composition);	//   I. Quadrant +x +y
+		if (clip.contains(circle.getX() - y, circle.getY() - x)) surface.compositePixel(circle.getX() - y, circle.getY() - x, color, composition);	//  II. Quadrant -x +y
+		if (clip.contains(circle.getX() + x, circle.getY() - y)) surface.compositePixel(circle.getX() + x, circle.getY() - y, color, composition);	// III. Quadrant -x -y
+		if (clip.contains(circle.getX() + y, circle.getY() + x)) surface.compositePixel(circle.getX() + y, circle.getY() + x, color, composition);	//  IV. Quadrant +x -y
 
 		r = err;
 
@@ -358,60 +381,227 @@ modm::ges::Painter<Format>::fillCircle(const Circle &circle, const AlphaColor &c
 	while (x < 0);
 }
 
+
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, Rect clip)
 {
+	// we don't draw empty circles
+	if (ellipse.isEmpty()) return;
+
+	// clip the clipping to the surface
 	clip = surface.clip(clip);
-	// don't even bother if rect is not in clip area
-	if (clip.isEmpty() or not clip.intersects(rectangle)) return;
 
-//		int16_t cl = clip.getLeft();	// save some stack
-//		int16_t ct = clip.getTop();		// save some stack
-	int16_t cr = clip.getRight();
-	int16_t cb = clip.getBottom();
+	// only draw intersecting circles
+	if (not ellipse.intersects(clip)) return;
 
-//		int16_t rl = rectangle.getLeft();	// save some stack
-//		int16_t rt = rectangle.getTop();	// save some stack
-	int16_t rr = rectangle.getRight();
-	int16_t rb = rectangle.getBottom();
-
-	int16_t ml = xpcc::max(rectangle.getLeft(), clip.getLeft());
-	int16_t mt = clip.getTop();	// decided at top line
-	int16_t mr = xpcc::min(rr, cr);
-	int16_t mb = cb;			// decided at bottom line
-
-	if (clip.getTop() <= rectangle.getTop()) {	// top line
-		mt = rectangle.getTop();
-		drawHorizontalLine(rectangle.getTop(), ml+1, mr-1, color, composition);
+	// only draw a pixel if radius is zero
+	if (ellipse.isNull()) {
+		surface.compositePixel(ellipse.getX(), ellipse.getY(), color, composition);
+		return;
 	}
 
-	if (rb <= cb) {	// bottom line
-		mb = rb;
-		drawHorizontalLine(rb, ml+1, mr-1, color, composition);
+	if (ellipse.isEven())
+	{
+		drawEvenEllipse(ellipse, color, composition, clip);
 	}
-
-	if (clip.getLeft() <= rectangle.getLeft()) {	// left line
-		drawVerticalLine(rectangle.getLeft(), mt, mb, color, composition);
-	}
-
-	if (rr <= cr) {	// right line
-		drawVerticalLine(rr, mt, mb, color, composition);
+	else
+	{
+		drawOddEllipse(ellipse, color, composition, clip);
 	}
 }
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
 {
-	clip = rectangle.intersected(surface.clip(clip));
-	// there is no need to test for isEmpty() !
+	int16_t a = ellipse.getWidth() / 2;
+	int16_t b = ellipse.getHeight() / 2;
 
-	for (int16_t yy = clip.getTop(); yy <= clip.getBottom(); yy++)
+	int32_t x = -a, y = 0;					// II. quadrant from bottom left to top right
+	int32_t e2 = b, dx = (1+2*x)*e2*e2;	// error increment
+	int32_t dy = x*x, err = dx+dy;			// error of 1.step
+	int16_t xm = ellipse.getX() + a;
+	int16_t ym = ellipse.getY() + b;
+
+	do {
+		if (clip.contains(xm-x, ym+y)) surface.compositePixel(xm-x, ym+y, color, composition);	//   I. Quadrant
+		if (clip.contains(xm+x, ym+y)) surface.compositePixel(xm+x, ym+y, color, composition);	//  II. Quadrant
+		if (clip.contains(xm+x, ym-y)) surface.compositePixel(xm+x, ym-y, color, composition);	// III. Quadrant
+		if (clip.contains(xm-x, ym-y)) surface.compositePixel(xm-x, ym-y, color, composition);	//  IV. Quadrant
+
+		e2 = 2*err;
+		if (e2 >= dx) { x++; err += dx += 2*int32_t(b)*b; }	// x step
+		if (e2 <= dy) { y++; err += dy += 2*int32_t(a)*a; }	// y step
+	}
+	while (x <= 0);
+
+	// too early stop for flat ellipses with a=1
+	if (xm >= clip.getLeft() and xm <= clip.getRight())
 	{
-		drawHorizontalLine(yy, clip.getLeft(), clip.getRight(), color, composition);
+		while (y++ < b)
+		{
+			// -> finish tip of ellipse
+			if (ym+y >= clip.getTop() and ym+y <= clip.getBottom()) surface.compositePixel(xm, ym+y, color, composition);
+			if (ym-y >= clip.getTop() and ym-y <= clip.getBottom()) surface.compositePixel(xm, ym-y, color, composition);
+		}
 	}
 }
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::drawOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+{
+	int16_t x0 = ellipse.getX();
+	int16_t y0 = ellipse.getY();
+	int16_t x1 = x0 + ellipse.getWidth();
+	int16_t y1 = y0 + ellipse.getHeight();
+
+	int32_t a = abs(x1-x0), b = abs(y1-y0), b1 = b & 1;           /* diameter */
+	int64_t dx = 4*(1.0-a)*b*b, dy = 4*(b1+1)*a*a;         /* error increment */
+	int64_t err = dx+dy+b1*a*a, e2;                        /* error of 1.step */
+
+	y0 += (b+1)/2; y1 = y0-b1;                              /* starting pixel */
+	a = 8*a*a; b1 = 8*b*b;
+
+	do
+	{
+		if (clip.contains(x1, y0)) surface.compositePixel(x1, y0, color, composition);	//   I. Quadrant
+		if (clip.contains(x0, y0)) surface.compositePixel(x0, y0, color, composition);	//  II. Quadrant
+		if (clip.contains(x0, y1)) surface.compositePixel(x0, y1, color, composition);	// III. Quadrant
+		if (clip.contains(x1, y1)) surface.compositePixel(x1, y1, color, composition);	//  IV. Quadrant
+		e2 = 2*err;
+		if (e2 <= dy) { ++y0; --y1; err += dy += a; }                 /* y step */
+		if (e2 >= dx || 2*err > dy) { ++x0; --x1; err += dx += b1; }  /* x step */
+	}
+	while (x0 <= x1);
+
+	// too early stop of flat ellipses a=1
+	while (y0-y1 <= b)
+	{
+		// -> finish tip of ellipse
+		if (clip.contains(x0-1, y0)) surface.compositePixel(x0-1, y0, color, composition);
+		if (clip.contains(x1+1, y0)) surface.compositePixel(x1+1, y0, color, composition);
+		if (clip.contains(x0-1, y1)) surface.compositePixel(x0-1, y1, color, composition);
+		if (clip.contains(x1+1, y1)) surface.compositePixel(x1+1, y1, color, composition);
+		++y0; --y1;
+	}
+}
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::fillEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+{
+	// we don't draw empty circles
+	if (ellipse.isEmpty()) return;
+
+	// clip the clipping to the surface
+	clip = surface.clip(clip);
+
+	// only draw intersecting circles
+	if (not ellipse.intersects(clip)) return;
+
+	// only draw a pixel if radius is zero
+	if (ellipse.isNull()) {
+		surface.compositePixel(ellipse.getX(), ellipse.getY(), color, composition);
+		return;
+	}
+
+	if (ellipse.isEven())
+	{
+		fillEvenEllipse(ellipse, color, composition, clip);
+	}
+	else
+	{
+		fillOddEllipse(ellipse, color, composition, clip);
+	}
+}
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::fillEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+{
+	int16_t a = ellipse.getWidth() / 2;
+	int16_t b = ellipse.getHeight() / 2;
+
+	int32_t x = -a, y = 0;					// II. quadrant from bottom left to top right
+	int32_t e2 = b, dx = (1+2*x)*e2*e2;	// error increment
+	int32_t dy = x*x, err = dx+dy;			// error of 1.step
+	int16_t xm = ellipse.getX() + a;
+	int16_t ym = ellipse.getY() + b;
+	int16_t yPrev = 0;
+
+	drawHorizontalLineClipped(ym-y, xm+x, xm-x, clip, color, composition);
+
+	do
+	{
+		if (yPrev != y)
+		{
+			drawHorizontalLineClipped(ym+y, xm+x, xm-x, clip, color, composition);
+			drawHorizontalLineClipped(ym-y, xm+x, xm-x, clip, color, composition);
+			yPrev = y;
+		}
+
+		e2 = 2*err;
+		if (e2 >= dx) { x++; err += dx += 2*int32_t(b)*b; }	// x step
+		if (e2 <= dy) { y++; err += dy += 2*int32_t(a)*a; }	// y step
+	}
+	while (x <= 0);
+
+	// too early stop for flat ellipses with a=1
+	// -> finish tip of ellipse
+	if (y < b)
+	{
+		drawVerticalLineClipped(xm, ym+y, ym+b, clip, color, composition);
+		drawVerticalLineClipped(xm, ym-y, ym-b, clip, color, composition);
+	}
+}
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::fillOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+{
+	int16_t x0 = ellipse.getX();
+	int16_t y0 = ellipse.getY();
+	int16_t x1 = x0 + ellipse.getWidth();
+	int16_t y1 = y0 + ellipse.getHeight();
+
+	int32_t a = abs(x1-x0), b = abs(y1-y0), b1 = b & 1;           /* diameter */
+	int64_t dx = 4*(1.0-a)*b*b, dy = 4*(b1+1)*a*a;         /* error increment */
+	int64_t err = dx+dy+b1*a*a, e2;                        /* error of 1.step */
+
+	y0 += (b+1)/2; y1 = y0-b1;                              /* starting pixel */
+	a = 8*a*a; b1 = 8*b*b;
+
+	int16_t yPrev = y0;
+	drawHorizontalLineClipped(y0, x0, x1, clip, color, composition);
+	if (y0 != y1) drawHorizontalLineClipped(y1, x0, x1, clip, color, composition);
+
+	do
+	{
+		if (yPrev != y0)
+		{
+			drawHorizontalLineClipped(y0, x0, x1, clip, color, composition);
+			drawHorizontalLineClipped(y1, x0, x1, clip, color, composition);
+			yPrev = y0;
+		}
+
+		e2 = 2*err;
+		if (e2 <= dy) { ++y0; --y1; err += dy += a; }                 /* y step */
+		if (e2 >= dx || 2*err > dy) { ++x0; --x1; err += dx += b1; }  /* x step */
+	}
+	while (x0 <= x1);
+
+	// too early stop of flat ellipses a=1
+	while (y0-y1 < b)
+	{
+		// -> finish tip of ellipse
+		++y0; --y1;
+		drawHorizontalLineClipped(y0, x0-1, x1+1, clip, color, composition);
+		drawHorizontalLineClipped(y1, x0-1, x1+1, clip, color, composition);
+	}
+}
+
 
 template< modm::ges::PixelFormat Format >
 void
@@ -426,6 +616,23 @@ modm::ges::Painter<Format>::drawHorizontalLineClipped(int16_t y, int16_t beginX,
 		{
 			// line starts before right of clip window
 			drawHorizontalLine(y, std::max(beginX, clip.getLeft()), std::min(endX, cR), color, composition);
+		}
+	}
+}
+
+template< modm::ges::PixelFormat Format >
+void
+modm::ges::Painter<Format>::drawVerticalLineClipped(int16_t x, int16_t beginY, int16_t endY, const Rect &clip,
+						  const AlphaColor &color, const CompositionOperator composition)
+{
+	if (x >= clip.getLeft() and x <= clip.getRight())
+	{
+		// Y is in clip window
+		int16_t cB = clip.getBottom();
+		if (beginY <= cB)
+		{
+			// line starts before right of clip window
+			drawVerticalLine(x, std::max(beginY, clip.getTop()), std::min(endY, cB), color, composition);
 		}
 	}
 }

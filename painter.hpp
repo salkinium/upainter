@@ -63,6 +63,22 @@ public:
 
 
 	inline void
+	drawRect(const Rect &rectangle, const AlphaColor &color, Rect clip)
+	{ drawRect(rectangle, color, A, clip); }
+
+	void
+	drawRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
+
+
+	inline void
+	fillRect(const Rect &rectangle, const AlphaColor &color, Rect clip)
+	{ fillRect(rectangle, color, A, clip); }
+
+	void
+	fillRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
+
+
+	inline void
 	drawCircle(const Circle &circle, const AlphaColor &color, Rect clip)
 	{ drawCircle(circle, color, A, clip); }
 
@@ -79,20 +95,33 @@ public:
 
 
 	inline void
-	drawRect(const Rect &rectangle, const AlphaColor &color, Rect clip)
-	{ drawRect(rectangle, color, A, clip); }
+	drawEllipse(const Ellipse &ellipse, const AlphaColor &color, Rect clip)
+	{ drawEllipse(ellipse, color, A, clip); }
 
 	void
-	drawRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
-
+	drawEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
 
 
 	inline void
-	fillRect(const Rect &rectangle, const AlphaColor &color, Rect clip)
-	{ fillRect(rectangle, color, A, clip); }
+	fillEllipse(const Ellipse &ellipse, const AlphaColor &color, Rect clip)
+	{ fillEllipse(ellipse, color, A, clip); }
 
 	void
-	fillRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
+	fillEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition = A, Rect clip = Rect());
+
+
+protected:
+	inline void
+	drawEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip);
+
+	inline void
+	drawOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip);
+
+	inline void
+	fillEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip);
+
+	inline void
+	fillOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip);
 
 
 protected:
@@ -100,7 +129,12 @@ protected:
 	drawHorizontalLineClipped(int16_t y, int16_t beginX, int16_t endX, const Rect &clip,
 							  const AlphaColor &color, const CompositionOperator composition);
 
+	inline void
+	drawVerticalLineClipped(int16_t x, int16_t beginY, int16_t endY, const Rect &clip,
+							  const AlphaColor &color, const CompositionOperator composition);
 
+
+protected:
 	inline void
 	drawHorizontalLine(int16_t y, int16_t beginX, int16_t endX,
 					   const AlphaColor &color, const CompositionOperator composition);
