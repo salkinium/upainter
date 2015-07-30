@@ -87,43 +87,43 @@ public:
 
 	void
 	AoverB(const ThisColor &a)
-	{ compose(a, 1, 1 - a.getAlpha()); }
+	{ compose(a, 1, !(a.value & 0b10)); }
 
 	void
 	BoverA(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 1); }
+	{ compose(a, !(value & 0b10), 1); }
 
 
 	void
 	AinB(const ThisColor &a)
-	{ compose(a, getAlpha(), 0); }
+	{ compose(a, (value & 0b10), 0); }
 
 	void
 	BinA(const ThisColor &a)
-	{ compose(a, 0, a.getAlpha()); }
+	{ compose(a, 0, (a.value & 0b10)); }
 
 
 	void
 	AoutB(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 0); }
+	{ compose(a, !(value & 0b10), 0); }
 
 	void
 	BoutA(const ThisColor &a)
-	{ compose(a, 0, 1 - a.getAlpha()); }
+	{ compose(a, 0, !(a.value & 0b10)); }
 
 
 	void
 	AatopB(const ThisColor &a)
-	{ compose(a, getAlpha(), 1 - a.getAlpha()); }
+	{ compose(a, (value & 0b10), !(a.value & 0b10)); }
 
 	void
 	BatopA(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), a.getAlpha()); }
+	{ compose(a, !(value & 0b10), (a.value & 0b10)); }
 
 
 	void
 	Xor(const ThisColor &a)
-	{ compose(a, 1 - getAlpha(), 1 - a.getAlpha()); }
+	{ compose(a, !(value & 0b10), !(a.value & 0b10)); }
 
 
 	void
@@ -133,16 +133,9 @@ public:
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
 	void
-	compose(const ThisColor &cA, const uint8_t fa, const uint8_t fb)
+	compose(const ThisColor &cA, const bool fa, const bool fb)
 	{
-		uint8_t a, g;
-		a = cA.getAlpha()     & fa;
-		g = cA.getGrayscale() & fa;
-
-		a |= getAlpha()     & fb;
-		g |= getGrayscale() & fb;
-
-		value = (a << 1) | g;
+		value = (fa ? cA.value : 0) | (fb ? value : 0);
 	}
 
 private:
