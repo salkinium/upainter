@@ -17,8 +17,8 @@ toQImageFormat(PixelFormat format)
 		case PixelFormat::L1:
 			return QImage::Format_MonoLSB;
 
-//		case PixelFormat::L8:	// only with Qt 5.5!
-//			return QImage::Format_Grayscale8;
+		case PixelFormat::L8:
+			return QImage::Format_Grayscale8;
 
 		case PixelFormat::ARGB2:
 		case PixelFormat::RGB332:
@@ -29,7 +29,6 @@ toQImageFormat(PixelFormat format)
 		case PixelFormat::AL2:
 		case PixelFormat::L4:
 		case PixelFormat::AL4:
-		case PixelFormat::L8:
 			return QImage::Format_Indexed8;
 
 		case PixelFormat::AL8:
@@ -112,15 +111,6 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 		{
 			Color c = Color(ColorAL4(uint8_t(i)));
 			table[i] = c.getValue();
-		}
-		image.setColorTable(table);
-	}
-	else if (format == PixelFormat::L8)
-	{
-		QVector<QRgb> table(256);
-		for(int i = 0; i < 256; i++)
-		{
-			table[i] = qRgb(i,i,i);
 		}
 		image.setColorTable(table);
 	}
