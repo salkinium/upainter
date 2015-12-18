@@ -167,7 +167,7 @@ public:
 			Rect margin(r.getTopLeft() - Point(radius, radius), r.getSize() + Size(2*radius, 2*radius));
 			// if the circle origin is outside rect with radius margin
 			// then the circle is definitivly NOT in the rect
-			if (not margin.contains(origin)) return false;
+			if (unlikely(not margin.contains(origin))) return false;
 		}
 
 		// so now the circle might be in the rect.
@@ -178,18 +178,18 @@ public:
 			uint8_t corner = 0;
 
 			// getLeft() requires no computation, so it is cheap to compare
-			if (origin.getX() < r.getLeft())        corner = 0b0100;
+			if (likely(origin.getX() < r.getLeft())) corner = 0b0100;
 			// otherwise check if origin is to the right of r
-			else if (origin.getX() > r.getRight())  corner = 0b0001;
+			else if (origin.getX() > r.getRight())   corner = 0b0001;
 
 			// if corner is zero the origin is between the left and right points of the rectangle.
 			// this means, that its definitely NOT in any of the corners, so it must intersect.
-			if (corner == 0) return true;
+			if (likely(corner == 0)) return true;
 
 			// corner not zero? then we need to know if origin is in the upper or lower corner
 
 			// getTop() also required no computation, so this is checked first
-			if (origin.getY() < r.getTop())         corner |= 0b0010;
+			if (likely(origin.getY() < r.getTop())) corner |= 0b0010;
 			// otherwise check if origin below bottom
 			else if (origin.getY() > r.getBottom()) corner |= 0b1000;
 

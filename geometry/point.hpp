@@ -2,6 +2,7 @@
 #define MODM_GES_POINT_HPP
 
 #include <xpcc/math/geometry/vector2.hpp>
+#include <xpcc/architecture/utils.hpp>
 
 namespace modm
 {

@@ -138,7 +138,7 @@ public:
 	normalized() const
 	{
 		Line line = *this;
-		if (getX2() < getX1()) {
+		if (unlikely(getX2() < getX1())) {
 			line.p2 = p1;
 			line.p1 = p2;
 		}

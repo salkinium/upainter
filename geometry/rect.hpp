@@ -257,12 +257,12 @@ public:
 	normalized() const
 	{
 		Rect norm = *this;
-		if (getWidth() < 0) {
+		if (unlikely(getWidth() < 0)) {
 			// "swap" left and right corners
 			norm.setX( getX() + getWidth() );
 			norm.setWidth( -getWidth() );
 		}
-		if (getHeight() < 0) {
+		if (unlikely(getHeight() < 0)) {
 			norm.setY( getY() + getHeight() );
 			norm.setHeight( -getHeight() );
 		}
@@ -312,7 +312,7 @@ public:
 	inline Rect
 	intersected(const Rect &r) const
 	{
-		if (intersects(r))
+		if (likely(intersects(r)))
 		{
 			return Rect(Point(xpcc::max(getLeft(),  r.getLeft()),  xpcc::max(getTop(),    r.getTop())),
 						Point(xpcc::min(getRight(), r.getRight()), xpcc::min(getBottom(), r.getBottom())));

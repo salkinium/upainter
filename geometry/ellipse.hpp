@@ -209,7 +209,7 @@ public:
 			Rect margin(r.getTopLeft() - Point(size.getWidth(), size.getHeight()), r.getSize() + size);
 			// if the Ellipse origin is outside rect with radius margin
 			// then the Ellipse is definitivly NOT in the rect
-			if (not margin.contains(origin)) return false;
+			if (likely(not margin.contains(origin))) return false;
 		}
 
 		// so now the Ellipse might be in the rect.
@@ -224,18 +224,18 @@ public:
 			uint8_t corner = 0;
 
 			// getLeft() requires no computation, so it is cheap to compare
-			if (ox < int32_t(r.getLeft())*2)        corner = 0b0100;
+			if (likely(ox < int32_t(r.getLeft())*2)) corner = 0b0100;
 			// otherwise check if origin is to the right of r
-			else if (ox > int32_t(r.getRight())*2)  corner = 0b0001;
+			else if (ox > int32_t(r.getRight())*2)   corner = 0b0001;
 
 			// if corner is zero the origin is between the left and right points of the rectangle.
 			// this means, that its definitely NOT in any of the corners, so it must intersect.
-			if (corner == 0) return true;
+			if (likely(corner == 0)) return true;
 
 			// corner not zero? then we need to know if origin is in the upper or lower corner
 
 			// getTop() also required no computation, so this is checked first
-			if (oy < int32_t(r.getTop())*2)         corner |= 0b0010;
+			if (likely(oy < int32_t(r.getTop())*2)) corner |= 0b0010;
 			// otherwise check if origin below bottom
 			else if (oy > int32_t(r.getBottom())*2) corner |= 0b1000;
 
