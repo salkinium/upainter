@@ -1,3 +1,4 @@
 [submodule "xpcc"]
 	path = xpcc
 	url = https://github.com/roboterclubaachen/xpcc.git
+	branch = develop
