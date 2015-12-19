@@ -23,8 +23,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::ARGB2;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -167,7 +169,7 @@ protected:
 	}
 
 private:
-	uint8_t value;
+	Type value{0};
 
 	friend
 	class PixelColor<PixelFormat::RGB332>;
@@ -188,8 +190,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::RGB332;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -367,7 +371,7 @@ protected:
 	}
 
 private:
-	uint8_t value;
+	Type value{0};
 };
 
 using ColorRGB332 = PixelColor<PixelFormat::RGB332>;

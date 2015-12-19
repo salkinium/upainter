@@ -27,8 +27,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::RGB8;
 
 	constexpr
-	PixelColor() :
-		parts{0,0,0} {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -206,7 +208,7 @@ private:
 	union
 	{
 		uint32_t value;
-		uint8_t parts[3];
+		uint8_t parts[3]{0,0,0};
 	};
 };
 

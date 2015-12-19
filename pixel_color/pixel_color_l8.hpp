@@ -24,8 +24,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::AL8;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -148,7 +150,7 @@ protected:
 private:
 	union
 	{
-		uint16_t value;
+		uint16_t value{0};
 		uint8_t parts[2];
 	};
 
@@ -171,8 +173,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::L8;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type grayscale) :
@@ -322,7 +326,7 @@ protected:
 	}
 
 private:
-	Type value;
+	Type value{0};
 };
 
 using ColorL8 = PixelColor<PixelFormat::L8>;

@@ -28,8 +28,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::AL1;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -139,7 +141,7 @@ protected:
 	}
 
 private:
-	Type value;
+	Type value{0};
 
 	friend
 	class PixelColor<PixelFormat::L1>;
@@ -160,8 +162,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::L1;
 
 	constexpr
-	PixelColor() :
-		value(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type grayscale) :
@@ -293,7 +297,7 @@ public:
 	{ value |= (a.value & 0b1); }
 
 private:
-	Type value;
+	Type value{0};
 };
 
 using ColorL1 = PixelColor<PixelFormat::L1>;

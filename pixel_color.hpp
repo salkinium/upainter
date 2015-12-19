@@ -38,8 +38,10 @@ public:
 	static constexpr PixelFormat Format = PixelFormat::ARGB8;
 
 	constexpr
-	PixelColor() :
-		composite(0) {}
+	PixelColor() = default;
+
+	constexpr
+	PixelColor(const PixelColor &) = default;
 
 	explicit constexpr
 	PixelColor(const Type value) :
@@ -185,7 +187,7 @@ protected:
 private:
 	union
 	{
-		uint32_t composite;
+		uint32_t composite{0};
 		uint8_t parts[4];
 	};
 
