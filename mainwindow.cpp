@@ -58,11 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
 		l += 0.2;
 
 		Rect clip = Rect(40 + int(-l/2) % 100, 20 +int(-l/4)%50, 60, 40);
-		painter.fillRect(clip, Color::White);
+		painter.fillRect(clip, ColorWhite);
 		Rect outline = Rect(int(l)%130, int(l)%70, 60, 40);
 		painter.drawRect(outline, fromQColor(offset, 1, 0.5, 0.5), Painter<Format>::Plus, Rect(20, 10, 127-40, 63-20));
 
-		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), Color::Blue, clip);
+		painter.fillRect(Rect(int(l)%160 - 20, int(l)%80 - 15, 10, 10), ColorBlue, clip);
 
 //		painter.drawLine(Line(64-128*sin(r), 32-128*cos(r), 64+128*sin(r), 32+128*cos(r)), Color::Red, clip);
 
@@ -70,17 +70,17 @@ MainWindow::MainWindow(QWidget *parent) :
 //		Line line(-141, 56, 110, 70);
 //		qDebug() << "(" << line.getX1() << "," << line.getY1() << ") ---> (" << line.getX2() << "," << line.getY2() << ")";
 		painter.drawLine(line, Color(0xff, 0, 0, 0x7f), Painter<Format>::AoverB);
-		painter.drawLine(line, Color::Blue, clip);
+		painter.drawLine(line, ColorBlue, clip);
 
-		painter.drawLine(Line(40 + int(l)%30, 32-128*cos(r), 40 + int(l)%30, 32+128*cos(r)), Color::Yellow, clip);
-		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), Color::Green, clip);
+		painter.drawLine(Line(40 + int(l)%30, 32-128*cos(r), 40 + int(l)%30, 32+128*cos(r)), ColorYellow, clip);
+		painter.drawLine(Line(64-128*sin(r), 20 - int(l)%30, 64+128*sin(r), 20 - int(l)%30), ColorGreen, clip);
 
-		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), Color::Blue, clip);
+		painter.drawCircle(Circle(70 - int(l/2)%30, 25 - int(l/4)%40, abs(42 * sin(r))), ColorBlue, clip);
 		painter.fillCircle(Circle(64, 32, abs(35 * sin(r))), Color(0, 0, 255, 64), Painter<Format>::AoverB);
 
 		Ellipse el(Point(5, 7), Size(abs(62 * sin(r*1.1))*2, abs(40 * cos(r))*2));
 		painter.drawEllipse(el, Color(255, 0, 255, 82), Painter<Format>::AoverB);
-		painter.drawEllipse(el, Color::Red, clip);
+		painter.drawEllipse(el, ColorRed, clip);
 
 		Ellipse el2(Point(60, 20), Size(abs(62 * sin(r)), abs(42 * sin(r))+1));
 		painter.fillEllipse(el2, Color(255, 0, 0, 82), Painter<Format>::AoverB);

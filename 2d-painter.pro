@@ -28,8 +28,7 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    qdisplay.cpp \
-    pixel_color.cpp
+    qdisplay.cpp
 
 HEADERS  += mainwindow.h \
     surface.hpp \
@@ -55,6 +54,7 @@ HEADERS  += mainwindow.h \
     pixel_color/pixel_color_rgb4.hpp \
     pixel_color/pixel_color_rgb332.hpp \
     painter_impl.hpp \
-    geometry/ellipse.hpp
+    geometry/ellipse.hpp \
+    color.hpp
 
 FORMS    += mainwindow.ui

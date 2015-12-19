@@ -19,18 +19,6 @@ class PixelColor<PixelFormat::ARGB8>
 {
 	using ThisColor = PixelColor<PixelFormat::ARGB8>;
 public:
-	static const ThisColor Black;
-	static const ThisColor White;
-
-	static const ThisColor Red;
-	static const ThisColor Green;
-	static const ThisColor Blue;
-
-	static const ThisColor Yellow;
-	static const ThisColor Cyan;
-	static const ThisColor Magenta;
-
-public:
 	using Type = uint32_t;
 	using AlphaColor = ThisColor;
 	static constexpr uint8_t Depth = 24;
@@ -195,8 +183,8 @@ private:
 	friend class PixelColor;
 };
 
-using Color = PixelColor<PixelFormat::ARGB8>;
-using ColorARGB8 = Color;
+using ColorARGB8 = PixelColor<PixelFormat::ARGB8>;
+using Color = ColorARGB8;
 
 
 } // namespace ges

@@ -2,7 +2,7 @@
 #define MODM_GES_PAINTER_HPP
 
 #include "surface.hpp"
-#include "pixel_color.hpp"
+#include "color.hpp"
 #include <xpcc/ui/animation/interpolation.hpp>
 #include <xpcc/math/utils/misc.hpp>
 
