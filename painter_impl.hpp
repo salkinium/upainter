@@ -7,7 +7,7 @@
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor &color, CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor color, CompositionOperator composition, Rect clip)
 {
 	if (line.isNull()) return;
 
@@ -224,7 +224,7 @@ modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor &color, 
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	clip = surface.clip(clip);
 	// don't even bother if rect is not in clip area
@@ -266,7 +266,7 @@ modm::ges::Painter<Format>::drawRect(const Rect &rectangle, const AlphaColor &co
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillRect(const Rect &rectangle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::fillRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	clip = rectangle.intersected(surface.clip(clip));
 	// there is no need to test for isEmpty() !
@@ -280,7 +280,7 @@ modm::ges::Painter<Format>::fillRect(const Rect &rectangle, const AlphaColor &co
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawCircle(const Circle &circle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	// we don't draw empty circles
 	if (unlikely(circle.isEmpty())) return;
@@ -333,7 +333,7 @@ modm::ges::Painter<Format>::drawCircle(const Circle &circle, const AlphaColor &c
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillCircle(const Circle &circle, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::fillCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	// we don't draw empty circles
 	if (unlikely(circle.isEmpty())) return;
@@ -385,7 +385,7 @@ modm::ges::Painter<Format>::fillCircle(const Circle &circle, const AlphaColor &c
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::drawEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	// we don't draw empty circles
 	if (unlikely(ellipse.isEmpty())) return;
@@ -414,7 +414,7 @@ modm::ges::Painter<Format>::drawEllipse(const Ellipse &ellipse, const AlphaColor
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+modm::ges::Painter<Format>::drawEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip)
 {
 	int16_t a = ellipse.getWidth() / 2;
 	int16_t b = ellipse.getHeight() / 2;
@@ -451,7 +451,7 @@ modm::ges::Painter<Format>::drawEvenEllipse(const Ellipse &ellipse, const AlphaC
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::drawOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+modm::ges::Painter<Format>::drawOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip)
 {
 	int16_t x0 = ellipse.getX();
 	int16_t y0 = ellipse.getY();
@@ -491,7 +491,7 @@ modm::ges::Painter<Format>::drawOddEllipse(const Ellipse &ellipse, const AlphaCo
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, Rect clip)
+modm::ges::Painter<Format>::fillEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, Rect clip)
 {
 	// we don't draw empty circles
 	if (unlikely(ellipse.isEmpty())) return;
@@ -520,7 +520,7 @@ modm::ges::Painter<Format>::fillEllipse(const Ellipse &ellipse, const AlphaColor
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillEvenEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+modm::ges::Painter<Format>::fillEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip)
 {
 	int16_t a = ellipse.getWidth() / 2;
 	int16_t b = ellipse.getHeight() / 2;
@@ -560,7 +560,7 @@ modm::ges::Painter<Format>::fillEvenEllipse(const Ellipse &ellipse, const AlphaC
 
 template< modm::ges::PixelFormat Format >
 void
-modm::ges::Painter<Format>::fillOddEllipse(const Ellipse &ellipse, const AlphaColor &color, const CompositionOperator composition, const Rect &clip)
+modm::ges::Painter<Format>::fillOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip)
 {
 	int16_t x0 = ellipse.getX();
 	int16_t y0 = ellipse.getY();
@@ -607,7 +607,7 @@ modm::ges::Painter<Format>::fillOddEllipse(const Ellipse &ellipse, const AlphaCo
 template< modm::ges::PixelFormat Format >
 void
 modm::ges::Painter<Format>::drawHorizontalLineClipped(int16_t y, int16_t beginX, int16_t endX, const Rect &clip,
-						  const AlphaColor &color, const CompositionOperator composition)
+						  const AlphaColor color, const CompositionOperator composition)
 {
 	if (y >= clip.getTop() and y <= clip.getBottom())
 	{
@@ -624,7 +624,7 @@ modm::ges::Painter<Format>::drawHorizontalLineClipped(int16_t y, int16_t beginX,
 template< modm::ges::PixelFormat Format >
 void
 modm::ges::Painter<Format>::drawVerticalLineClipped(int16_t x, int16_t beginY, int16_t endY, const Rect &clip,
-						  const AlphaColor &color, const CompositionOperator composition)
+						  const AlphaColor color, const CompositionOperator composition)
 {
 	if (x >= clip.getLeft() and x <= clip.getRight())
 	{
@@ -642,7 +642,7 @@ modm::ges::Painter<Format>::drawVerticalLineClipped(int16_t x, int16_t beginY, i
 template< modm::ges::PixelFormat Format >
 void
 modm::ges::Painter<Format>::drawHorizontalLine(int16_t y, int16_t beginX, int16_t endX,
-				   const AlphaColor &color, const CompositionOperator composition)
+				   const AlphaColor color, const CompositionOperator composition)
 {
 	for (int16_t xx = beginX; xx <= endX; xx++)
 	{
@@ -653,7 +653,7 @@ modm::ges::Painter<Format>::drawHorizontalLine(int16_t y, int16_t beginX, int16_
 template< modm::ges::PixelFormat Format >
 void
 modm::ges::Painter<Format>::drawVerticalLine(int16_t x, int16_t beginY, int16_t endY,
-				 const AlphaColor &color, const CompositionOperator composition)
+				 const AlphaColor color, const CompositionOperator composition)
 {
 	for (int16_t yy = beginY; yy <= endY; yy++)
 	{

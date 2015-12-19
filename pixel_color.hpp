@@ -79,75 +79,75 @@ public:
 	{ return parts[3]; }
 
 	constexpr bool
-	operator== (const ThisColor &other) const
+	operator== (const ThisColor other) const
 	{ return (composite == other.composite); }
 
 
 	// Porter and Duff's compositing operations
 	void
-	Clear(const ThisColor &)
+	Clear(const ThisColor)
 	{ composite = 0; }
 
 
 	void
-	A(const ThisColor &a)
+	A(const ThisColor a)
 	{ composite = a.composite; }
 
 	void
-	B(const ThisColor &)
+	B(const ThisColor)
 	{ }
 
 
 	void
-	AoverB(const ThisColor &a)
+	AoverB(const ThisColor a)
 	{ compose(a, 255, 255 - a.getAlpha()); }
 
 	void
-	BoverA(const ThisColor &a)
+	BoverA(const ThisColor a)
 	{ compose(a, 255 - getAlpha(), 255); }
 
 
 	void
-	AinB(const ThisColor &a)
+	AinB(const ThisColor a)
 	{ compose(a, getAlpha(), 0); }
 
 	void
-	BinA(const ThisColor &a)
+	BinA(const ThisColor a)
 	{ compose(a, 0, a.getAlpha()); }
 
 
 	void
-	AoutB(const ThisColor &a)
+	AoutB(const ThisColor a)
 	{ compose(a, 255 - getAlpha(), 0); }
 
 	void
-	BoutA(const ThisColor &a)
+	BoutA(const ThisColor a)
 	{ compose(a, 0, 255 - a.getAlpha()); }
 
 
 	void
-	AatopB(const ThisColor &a)
+	AatopB(const ThisColor a)
 	{ compose(a, getAlpha(), 255 - a.getAlpha()); }
 
 	void
-	BatopA(const ThisColor &a)
+	BatopA(const ThisColor a)
 	{ compose(a, 255 - getAlpha(), a.getAlpha()); }
 
 
 	void
-	Xor(const ThisColor &a)
+	Xor(const ThisColor a)
 	{ compose(a, 255 - getAlpha(), 255 - a.getAlpha()); }
 
 
 	void
-	Plus(const ThisColor &a)
+	Plus(const ThisColor a)
 	{ compose(a, 255, 255); }
 
 
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
 	void
-	compose(const ThisColor &cA, const uint8_t fa, const uint8_t fb)
+	compose(const ThisColor cA, const uint8_t fa, const uint8_t fb)
 	{
 		uint32_t a, r, g, b;
 		a = cA.getAlpha() * uint32_t(fa);

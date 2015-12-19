@@ -85,7 +85,7 @@ public:
 
 	template <PixelFormat CompositeFormat>
 	inline void
-	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> color) = &NativeColor::A)
 	{
 		NativeColor pixel(getPixel(x, y));
 		(pixel.*composition)(color);
@@ -94,7 +94,7 @@ public:
 
 	template <PixelFormat CompositeFormat>
 	inline void
-	compositePixel(const Point p, const PixelColor<CompositeFormat> &color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> &color) = &NativeColor::A)
+	compositePixel(const Point p, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> color) = &NativeColor::A)
 	{
 		NativeColor pixel(getPixel(p));
 		(pixel.*composition)(color);

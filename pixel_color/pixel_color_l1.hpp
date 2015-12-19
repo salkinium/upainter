@@ -66,74 +66,74 @@ public:
 	}
 
 	constexpr bool
-	operator== (const ThisColor &other) const
+	operator== (const ThisColor other) const
 	{ return value == other.value; }
 
 
 	// Porter and Duff's compositing operations
 	void
-	Clear(const ThisColor &)
+	Clear(const ThisColor)
 	{ value = 0; }
 
 
 	void
-	A(const ThisColor &a)
+	A(const ThisColor a)
 	{ value = a.value; }
 
 	void
-	B(const ThisColor &)
+	B(const ThisColor)
 	{ }
 
 
 	void
-	AoverB(const ThisColor &a)
+	AoverB(const ThisColor a)
 	{ compose(a, 1, !(a.value & 0b10)); }
 
 	void
-	BoverA(const ThisColor &a)
+	BoverA(const ThisColor a)
 	{ compose(a, !(value & 0b10), 1); }
 
 
 	void
-	AinB(const ThisColor &a)
+	AinB(const ThisColor a)
 	{ compose(a, (value & 0b10), 0); }
 
 	void
-	BinA(const ThisColor &a)
+	BinA(const ThisColor a)
 	{ compose(a, 0, (a.value & 0b10)); }
 
 
 	void
-	AoutB(const ThisColor &a)
+	AoutB(const ThisColor a)
 	{ compose(a, !(value & 0b10), 0); }
 
 	void
-	BoutA(const ThisColor &a)
+	BoutA(const ThisColor a)
 	{ compose(a, 0, !(a.value & 0b10)); }
 
 
 	void
-	AatopB(const ThisColor &a)
+	AatopB(const ThisColor a)
 	{ compose(a, (value & 0b10), !(a.value & 0b10)); }
 
 	void
-	BatopA(const ThisColor &a)
+	BatopA(const ThisColor a)
 	{ compose(a, !(value & 0b10), (a.value & 0b10)); }
 
 
 	void
-	Xor(const ThisColor &a)
+	Xor(const ThisColor a)
 	{ compose(a, !(value & 0b10), !(a.value & 0b10)); }
 
 
 	void
-	Plus(const ThisColor &a)
+	Plus(const ThisColor a)
 	{ compose(a, 1, 1); }
 
 protected:
 	// see Porter and Duff's "Compositing Digital Images"
 	void
-	compose(const ThisColor &cA, const bool fa, const bool fb)
+	compose(const ThisColor cA, const bool fa, const bool fb)
 	{
 		value = (fa ? cA.value : 0) | (fb ? value : 0);
 	}
@@ -189,107 +189,107 @@ public:
 	}
 
 	constexpr bool
-	operator== (const ThisColor &other) const
+	operator== (const ThisColor other) const
 	{ return value == other.value; }
 
 
 	// Porter and Duff's compositing operations
 	void
-	Clear(const ThisColor &)
+	Clear(const ThisColor)
 	{ value = 0; }
 	void
-	Clear(const AlphaColor &)
+	Clear(const AlphaColor)
 	{ value = 0; }
 
 
 	inline void
-	A(const ThisColor &a)
+	A(const ThisColor a)
 	{ value = a.value; }
 	inline void
-	A(const AlphaColor &a)
+	A(const AlphaColor a)
 	{ value = a.value & 0b1; }
 
 	inline void
-	B(const ThisColor &)
+	B(const ThisColor)
 	{ }
 	inline void
-	B(const AlphaColor &)
+	B(const AlphaColor)
 	{ }
 
 
 
 	void	// compose(a, 1, 0);
-	AoverB(const ThisColor &a)
+	AoverB(const ThisColor a)
 	{ value = a.value; }
 	void
-	AoverB(const AlphaColor &a)
+	AoverB(const AlphaColor a)
 	{ if (a.value & 0b10) value = a.value & 0b1; }
 
 	void	// compose(a, 0, 1);
-	BoverA(const ThisColor &)
+	BoverA(const ThisColor)
 	{ }
 	void	// compose(a, 0, 1);
-	BoverA(const AlphaColor &)
+	BoverA(const AlphaColor)
 	{ }
 
 
 	void	// compose(a, 1, 0);
-	AinB(const ThisColor &a)
+	AinB(const ThisColor a)
 	{ value = a.value; }
 	void	// compose(a, 1, 0);
-	AinB(const AlphaColor &a)
+	AinB(const AlphaColor a)
 	{ value = a.value & 0b1; }
 
 	void	// compose(a, 0, 1);
-	BinA(const ThisColor &)
+	BinA(const ThisColor)
 	{ }
 	void
-	BinA(const AlphaColor &a)
+	BinA(const AlphaColor a)
 	{ value &= a.getAlpha(); }
 
 
 	void	// compose(a, 0, 0);
-	AoutB(const ThisColor &)
+	AoutB(const ThisColor)
 	{ value = 0; }
 	void	// compose(a, 0, 0);
-	AoutB(const AlphaColor &)
+	AoutB(const AlphaColor)
 	{ value = 0; }
 
 	void	// compose(a, 0, 0);
-	BoutA(const ThisColor &)
+	BoutA(const ThisColor)
 	{ value = 0; }
 	void
-	BoutA(const AlphaColor &a)
+	BoutA(const AlphaColor a)
 	{ value &= ~a.getAlpha(); }
 
 
 	void	// compose(a, 1, 0);
-	AatopB(const ThisColor &a)
+	AatopB(const ThisColor a)
 	{ value = a.value; }
 	void
-	AatopB(const AlphaColor &a)
+	AatopB(const AlphaColor a)
 	{ value = a.getGrayscale() | (getGrayscale() & ~a.getAlpha()); }
 
 	void	// compose(a, 0, 1);
-	BatopA(const ThisColor &)
+	BatopA(const ThisColor)
 	{ }
 	void
-	BatopA(const AlphaColor &a)
+	BatopA(const AlphaColor a)
 	{ value &= a.getAlpha(); }
 
 
 	void	// compose(a, 0, 0);
-	Xor(const ThisColor &)
+	Xor(const ThisColor)
 	{ value = 0; }
 	void
-	Xor(const AlphaColor &a)
+	Xor(const AlphaColor a)
 	{ value &= ~a.getAlpha(); }
 
 	void
-	Plus(const ThisColor &a)
+	Plus(const ThisColor a)
 	{ value |= a.value; }
 	void
-	Plus(const AlphaColor &a)
+	Plus(const AlphaColor a)
 	{ value |= (a.value & 0b1); }
 
 private:
