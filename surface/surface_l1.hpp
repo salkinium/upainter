@@ -83,24 +83,6 @@ public:
 		}
 	}
 
-	template <PixelFormat CompositeFormat>
-	inline void
-	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> color) = &NativeColor::A)
-	{
-		NativeColor pixel(getPixel(x, y));
-		(pixel.*composition)(color);
-		setPixel(x, y, pixel);
-	}
-
-	template <PixelFormat CompositeFormat>
-	inline void
-	compositePixel(const Point p, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat> color) = &NativeColor::A)
-	{
-		NativeColor pixel(getPixel(p));
-		(pixel.*composition)(color);
-		setPixel(p, pixel);
-	}
-
 	inline void
 	setPixel(Point p, NativeColor color)
 	{
@@ -131,6 +113,24 @@ public:
 	getPixel(Point p) const
 	{
 		return getPixel(p.getX(), p.getY());
+	}
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(uint16_t x, uint16_t y, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat>) = &NativeColor::A)
+	{
+		NativeColor pixel(getPixel(x, y));
+		(pixel.*composition)(color);
+		setPixel(x, y, pixel);
+	}
+
+	template <PixelFormat CompositeFormat>
+	inline void
+	compositePixel(const Point p, const PixelColor<CompositeFormat> color, void (NativeColor::*composition)(const PixelColor<CompositeFormat>) = &NativeColor::A)
+	{
+		NativeColor pixel(getPixel(p));
+		(pixel.*composition)(color);
+		setPixel(p, pixel);
 	}
 
 protected:
