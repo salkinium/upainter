@@ -11,14 +11,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = 2d-painter
 TEMPLATE = app
 
-#CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++1y
-
 macx {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
     QMAKE_CXXFLAGS += -stdlib=libc++ -mmacosx-version-min=10.7
     LIBS += -stdlib=libc++ -mmacosx-version-min=10.7
+
+    # I have an old version of clang...
+    QMAKE_CXXFLAGS += -std=c++1y
+}
+else {
+    CONFIG += c++14
 }
 
 # xpcc header files need to be visible

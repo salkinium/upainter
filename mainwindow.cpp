@@ -31,6 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	setCentralWidget(new QWidget);
 	centralWidget()->setLayout(layout);
 
+	constexpr ColorRGB332 s(ColorBlack);
+	static_assert(s.getValue() == 0, "bla");
+
 	connect(&timer, &QTimer::timeout, [this]()
 	{
 		offset += 0.0007135;
@@ -83,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		painter.drawEllipse(el, ColorRed, clip);
 
 		Ellipse el2(Point(60, 20), Size(abs(62 * sin(r)), abs(42 * sin(r))+1));
-		painter.fillEllipse(el2, Color(255, 0, 0, 82), Painter<Format>::AoverB);
+		painter.fillEllipse(el2, Color(255, 0, 0, 82), Painter<Format>::AoverB, Rect(20, 10, 127-40, 63-20));
 
 		qDisplay.repaint();
 	});

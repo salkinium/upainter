@@ -41,7 +41,7 @@ PixelFormat
 	ARGB8 = 17,
 };
 
-inline uint8_t
+constexpr uint8_t
 bitsPerPixel(PixelFormat format)
 {
 	switch(format)

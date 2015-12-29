@@ -157,7 +157,7 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
 		{
-			Color c = Color(PixelColor<PixelFormat::RGB332>(uint8_t(i)));
+			Color c = Color(ColorRGB332(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
@@ -167,7 +167,7 @@ QDisplay::QDisplay(uchar *data, const uint16_t width, const uint16_t height, con
 		QVector<QRgb> table(256);
 		for(int i = 0; i < 256; i++)
 		{
-			Color c = Color(PixelColor<PixelFormat::ARGB2>(uint8_t(i)));
+			Color c = Color(ColorARGB2(uint8_t(i)));
 			table[i] = c.getValue();
 		}
 		image.setColorTable(table);
