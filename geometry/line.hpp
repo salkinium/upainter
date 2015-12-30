@@ -22,10 +22,10 @@ class Line
 public:
 	inline
 	Line() :
-		p1(0), p2(0) {}
+		p1(0,0), p2(0,0) {}
 
 	inline
-	Line(int16_t x1, int16_t y1, int16_t x2, int16_t y2) :
+	Line(coord_t x1, coord_t y1, coord_t x2, coord_t y2) :
 		p1(x1, y1), p2(x2, y2) {}
 
 	inline
@@ -34,7 +34,7 @@ public:
 
 	inline
 	Line(const Point &p) :
-		p1(0), p2(p.vector) {}
+		p1(0,0), p2(p.vector) {}
 
 	inline
 	Line(const Line &l) :
@@ -46,11 +46,11 @@ public:
 	{ return Rect(Point(p1), Point(p2)); }
 
 
-	inline int16_t
+	inline coord_t
 	getDx() const
 	{ return (p2.getX() - p1.getX()); }
 
-	inline int16_t
+	inline coord_t
 	getDy() const
 	{ return (p2.getY() - p1.getY()); }
 
@@ -81,25 +81,25 @@ public:
 	{ this->p1 = p1.vector; this->p2 = p2.vector; }
 
 
-	inline int16_t
+	inline coord_t
 	getX1() const
 	{ return p1.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getY1() const
 	{ return p1.getY(); }
 
-	inline int16_t
+	inline coord_t
 	getX2() const
 	{ return p2.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getY2() const
 	{ return p2.getY(); }
 
 
 	inline void
-	setLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+	setLine(coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	{ p1.set(x1, y1); p2.set(x2, y2); }
 
 
@@ -120,10 +120,10 @@ public:
 	}
 
 	inline void
-	translate(int16_t dx, int16_t dy)
+	translate(coord_t dx, coord_t dy)
 	{
-		p1 += xpcc::Vector2i(dx, dy);
-		p2 += xpcc::Vector2i(dx, dy);
+		p1 += Vector(dx, dy);
+		p2 += Vector(dx, dy);
 	}
 
 
@@ -135,10 +135,10 @@ public:
 	}
 
 	inline Line
-	translated(int16_t dx, int16_t dy) const
+	translated(coord_t dx, coord_t dy) const
 	{
-		return Line(p1 + xpcc::Vector2i(dx, dy),
-					p2 + xpcc::Vector2i(dx, dy));
+		return Line(p1 + Vector(dx, dy),
+					p2 + Vector(dx, dy));
 	}
 
 	inline Line
@@ -162,8 +162,8 @@ public:
 	{ return (p1 == p2); }
 
 private:
-	xpcc::Vector2i p1;
-	xpcc::Vector2i p2;
+	Vector p1;
+	Vector p2;
 
 	friend class Rect;
 };

@@ -26,11 +26,11 @@ public:
 		origin(0,0), radius(0) {}
 
 	inline
-	Circle(int16_t x, int16_t y, int16_t radius) :
+	Circle(coord_t x, coord_t y, coord_t radius) :
 		origin(x, y), radius(radius) {}
 
 	inline
-	Circle(const Point &origin, int16_t radius) :
+	Circle(const Point &origin, coord_t radius) :
 		origin(origin), radius(radius) {}
 
 
@@ -65,21 +65,21 @@ public:
 	getOrigin() const
 	{ return origin; }
 
-	inline int16_t
+	inline coord_t
 	getX() const
 	{ return origin.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getY() const
 	{ return origin.getY(); }
 
 	// setter origin
 	inline void
-	setX(int16_t x)
+	setX(coord_t x)
 	{ origin.setX(x); }
 
 	inline void
-	setY(int16_t y)
+	setY(coord_t y)
 	{ origin.setY(y); }
 
 	inline void
@@ -87,24 +87,24 @@ public:
 	{ origin = position; }
 
 	inline void
-	moveTo(int16_t x, int16_t y)
+	moveTo(coord_t x, coord_t y)
 	{ origin = Point(x, y); }
 
 
 	// getter radius
-	inline int16_t
+	inline coord_t
 	getRadius() const
 	{ return radius; }
 
 	// setter radius
 	inline void
-	setRadius(int16_t radius)
+	setRadius(coord_t radius)
 	{ this->radius = radius; }
 
 
 	// translate
 	inline void
-	translate(int16_t dx, int16_t dy)
+	translate(coord_t dx, coord_t dy)
 	{ origin += Point(dx, dy); }
 
 	inline void
@@ -112,7 +112,7 @@ public:
 	{ origin += offset; }
 
 	inline Circle
-	translated(int16_t dx, int16_t dy) const
+	translated(coord_t dx, coord_t dy) const
 	{ return Circle(origin + Point(dx, dy), radius); }
 
 	inline Circle
@@ -123,10 +123,10 @@ public:
 	// contains
 	inline bool
 	contains(const Point &point) const
-	{ return origin.distanceSquared(point) <= (int32_t(radius) * radius); }
+	{ return wide_coord_t(origin.distanceSquared(point)) <= (wide_coord_t(radius) * wide_coord_t(radius)); }
 
 	inline bool
-	contains(int16_t x, int16_t y) const
+	contains(coord_t x, coord_t y) const
 	{ return contains(Point(x, y)); }
 
 	inline bool
@@ -145,7 +145,7 @@ public:
 	inline bool
 	intersects(const Circle &c) const
 	{
-		int16_t r = radius + c.radius;
+		coord_t r = radius + c.radius;
 		return (origin.distanceSquared(c.origin) <= uint16_t(r * r));
 		// well... that was simple.
 	}
@@ -154,14 +154,14 @@ public:
 	intersects(const Line &l) const
 	{
 		// http://math.stackexchange.com/questions/275529/check-if-line-intersects-with-circles-perimeter
-		int32_t a = l.getX2() - l.getX1();
-		int32_t b = l.getY1() - l.getY2();
-		int32_t c = (-a) * l.getY1() + (-b) * l.getX1();
+		wide_coord_t a = l.getX2() - l.getX1();
+		wide_coord_t b = l.getY1() - l.getY2();
+		wide_coord_t c = (-a) * l.getY1() + (-b) * l.getX1();
 
-		int32_t d = a * origin.getX() + b * origin.getY() + c;
+		wide_coord_t d = a * origin.getX() + b * origin.getY() + c;
 		d *= d;	// square it, now definitely positive
 
-		int32_t r = radius;
+		wide_coord_t r = radius;
 		r *= a * a + b * b;
 
 		return d <= r;
@@ -225,7 +225,7 @@ public:
 
 private:
 	Point origin;
-	int16_t radius;
+	coord_t radius;
 };
 
 } // namespace ges

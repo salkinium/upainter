@@ -25,7 +25,7 @@ public:
 		origin(0,0), size(-1,-1) {}
 
 	inline
-	Ellipse(int16_t x, int16_t y, int16_t xRadius, int16_t yRadius) :
+	Ellipse(coord_t x, coord_t y, coord_t xRadius, coord_t yRadius) :
 		origin(x - xRadius, y - yRadius), size(xRadius*2, yRadius*2) {}
 
 	inline
@@ -58,7 +58,7 @@ public:
 	{
 		// yes this also works for negative numbers in 2s compliment.
 		// although it makes no sense then.
-		return not ((size.getHeight() & 0x1) or (size.getWidth() & 0x1));
+		return not ((int16_t(size.getHeight()) & 0x1) or (int16_t(size.getWidth()) & 0x1));
 	}
 
 
@@ -74,21 +74,21 @@ public:
 	getOrigin() const
 	{ return origin; }
 
-	inline int16_t
+	inline coord_t
 	getX() const
 	{ return origin.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getY() const
 	{ return origin.getY(); }
 
 	// setter origin
 	inline void
-	setX(int16_t x)
+	setX(coord_t x)
 	{ origin.setX(x); }
 
 	inline void
-	setY(int16_t y)
+	setY(coord_t y)
 	{ origin.setY(y); }
 
 	inline void
@@ -96,7 +96,7 @@ public:
 	{ origin = position; }
 
 	inline void
-	moveTo(int16_t x, int16_t y)
+	moveTo(coord_t x, coord_t y)
 	{ origin = Point(x, y); }
 
 
@@ -105,11 +105,11 @@ public:
 	getSize() const
 	{ return size; }
 
-	inline int16_t
+	inline coord_t
 	getHeight() const
 	{ return size.getHeight(); }
 
-	inline int16_t
+	inline coord_t
 	getWidth() const
 	{ return size.getWidth(); }
 
@@ -129,7 +129,7 @@ public:
 
 	// translate
 	inline void
-	translate(int16_t dx, int16_t dy)
+	translate(coord_t dx, coord_t dy)
 	{ origin += Point(dx, dy); }
 
 	inline void
@@ -137,7 +137,7 @@ public:
 	{ origin += offset; }
 
 	inline Ellipse
-	translated(int16_t dx, int16_t dy) const
+	translated(coord_t dx, coord_t dy) const
 	{ return Ellipse(origin + Point(dx, dy), size); }
 
 	inline Ellipse
@@ -151,7 +151,7 @@ public:
 	{ return contains(point.getX(), point.getY()); }
 
 	inline bool
-	contains(int16_t x, int16_t y) const
+	contains(coord_t x, coord_t y) const
 	{
 		/* _normalized_ point (x,y) is in ellipse (a,b) determined by following formula
 		 *    ~>   x^2 / a^2  +  y^2 / b^2  <=  1.0
@@ -164,18 +164,12 @@ public:
 		 *    ~>   4 * 4 * x^2 * b^2  +  4 * 4 * y^2 * a^2  <=  4 * 4 * a^2 * b^2
 		 */
 		// diameter squared = a^2 * 4
-		int32_t a2 = int32_t(size.getWidth()) * size.getWidth();
-		int32_t b2 = int32_t(size.getHeight()) * size.getHeight();
+		wide_coord_t a2 = wide_coord_t(size.getWidth()) * wide_coord_t(size.getWidth());
+		wide_coord_t b2 = wide_coord_t(size.getHeight()) * wide_coord_t(size.getHeight());
 
 		// (x,y) = 2*P - (2*TL + S)
-		int32_t px = int32_t(x) * 2;
-		int32_t py = int32_t(y) * 2;
-
-		px -= int32_t(origin.getX()) * 2;
-		py -= int32_t(origin.getY()) * 2;
-
-		px -= size.getWidth();
-		py -= size.getHeight();
+		wide_coord_t px = wide_coord_t(x) * 2 - wide_coord_t(origin.getX()) * 2 - wide_coord_t(size.getWidth());
+		wide_coord_t py = wide_coord_t(y) * 2 - wide_coord_t(origin.getY()) * 2 - wide_coord_t(size.getHeight());
 
 		// = p^2 * 4
 		px *= px;

@@ -10,6 +10,7 @@
 
 #include <xpcc/math/geometry/vector2.hpp>
 #include <xpcc/architecture/utils.hpp>
+#include <ges.hpp>
 
 namespace modm
 {
@@ -21,7 +22,7 @@ class
 Point
 {
 	inline
-	Point(const xpcc::Vector2i &vector) :
+	Point(const Vector &vector) :
 		vector(vector)
 	{}
 
@@ -32,7 +33,7 @@ public:
 	{}
 
 	inline
-	Point(int16_t x, int16_t y) :
+	Point(coord_t x, coord_t y) :
 		vector(x, y)
 	{}
 
@@ -41,32 +42,32 @@ public:
 		vector(point.vector)
 	{}
 
-	inline int16_t
+	inline coord_t
 	getX() const
 	{
 		return vector.getX();
 	}
 
-	inline int16_t
+	inline coord_t
 	getY() const
 	{
 		return vector.getY();
 	}
 
 	inline void
-	setX(int16_t x)
+	setX(coord_t x)
 	{
 		return vector.setX(x);
 	}
 
 	inline void
-	setY(int16_t y)
+	setY(coord_t y)
 	{
 		return vector.setY(y);
 	}
 
 	inline void
-	set(int16_t x, int16_t y)
+	set(coord_t x, coord_t y)
 	{
 		return vector.set(x, y);
 	}
@@ -102,7 +103,7 @@ public:
 
 	inline bool
 	isNull() const
-	{ return vector == xpcc::Vector2i(0); }
+	{ return vector == Vector(0,0); }
 
 
 	inline Point operator - () const
@@ -111,7 +112,7 @@ public:
 	{ return (vector - rhs.vector); }
 	inline Point operator + (const Point &rhs) const
 	{ return (vector + rhs.vector); }
-	inline int16_t operator * (const Point &rhs) const
+	inline coord_t operator * (const Point &rhs) const
 	{ return (vector * rhs.vector); }
 	inline Point operator * (const float scale) const
 	{ return (vector * scale); }
@@ -142,7 +143,7 @@ public:
 	{ return vector >= rhs.vector; }
 
 private:
-	xpcc::Vector2i vector;
+	Vector vector;
 
 	friend class Rect;
 	friend class Point;

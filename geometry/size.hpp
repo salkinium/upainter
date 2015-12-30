@@ -9,6 +9,7 @@
 #define MODM_GES_SIZE_HPP
 
 #include <xpcc/math/geometry/vector2.hpp>
+#include <ges.hpp>
 
 namespace modm
 {
@@ -19,7 +20,7 @@ namespace ges
 class Size
 {
 	inline
-	Size(xpcc::Vector2i vector) :
+	Size(Vector vector) :
 		vector(vector) {}
 
 public:
@@ -29,7 +30,7 @@ public:
 	{}
 
 	inline
-	Size(int16_t width, int16_t height) :
+	Size(coord_t width, coord_t height) :
 		vector(width, height)
 	{}
 
@@ -38,35 +39,35 @@ public:
 		vector(size.vector)
 	{}
 
-	inline int16_t
+	inline coord_t
 	getWidth() const
 	{ return vector.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getHeight() const
 	{ return vector.getY(); }
 
 	inline void
-	setWidth(int16_t width)
+	setWidth(coord_t width)
 	{ return vector.setX(width); }
 
 	inline void
-	setHeight(int16_t height)
+	setHeight(coord_t height)
 	{ return vector.setY(height); }
 
 	inline bool isEmpty() const
 	{
-		return (vector <= xpcc::Vector2i(0));
+		return (vector <= Vector(0,0));
 	}
 
 	inline bool isValid() const
 	{
-		return (vector >= xpcc::Vector2i(0));
+		return (vector >= Vector(0,0));
 	}
 
 	inline bool isNull() const
 	{
-		return (vector == xpcc::Vector2i(0));
+		return (vector == Vector(0,0));
 	}
 
 	inline void transpose()
@@ -83,7 +84,7 @@ public:
 	{ return (vector - rhs.vector); }
 	inline Size operator + (const Size &rhs) const
 	{ return (vector + rhs.vector); }
-	inline int16_t operator * (const Size &rhs) const
+	inline coord_t operator * (const Size &rhs) const
 	{ return (vector * rhs.vector); }
 	inline Size operator * (const float scale) const
 	{ return (vector * scale); }
@@ -113,7 +114,7 @@ public:
 	{ return vector >= rhs.vector; }
 
 private:
-	xpcc::Vector2i vector;
+	Vector vector;
 
 	friend class Rect;
 	friend class Size;

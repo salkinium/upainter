@@ -34,7 +34,7 @@ public:
 		origin(origin), size(size) {}
 
 	inline
-	Rect(int16_t x, int16_t y, int16_t width, int16_t height) :
+	Rect(coord_t x, coord_t y, coord_t width, coord_t height) :
 		origin(x, y), size(width, height) {}
 
 	inline
@@ -56,19 +56,19 @@ public:
 
 
 	inline void
-	adjust(int16_t dx1, int16_t dy1, int16_t dx2, int16_t dy2)
+	adjust(coord_t dx1, coord_t dy1, coord_t dx2, coord_t dy2)
 	{ origin += Point(dx1, dy1); size += Size(dx2 - dx1, dy2 - dy1); }
 
 	inline Rect
-	adjusted(int16_t dx1, int16_t dy1, int16_t dx2, int16_t dy2) const
+	adjusted(coord_t dx1, coord_t dy1, coord_t dx2, coord_t dy2) const
 	{ return Rect(origin + Point(dx1, dy1), size + Size(dx2 - dx1, dy2 - dy1)); }
 
 	inline void
-	setRect(int16_t x, int16_t y, int16_t width, int16_t height)
+	setRect(coord_t x, coord_t y, coord_t width, coord_t height)
 	{ origin = Point(x, y); size = Size(width, height); }
 
 	inline void
-	setCoords(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+	setCoords(coord_t x1, coord_t y1, coord_t x2, coord_t y2)
 	{ origin = Point(x1, y1); size = Size(x2 - x1, y2 - y1); }
 
 
@@ -77,21 +77,21 @@ public:
 	getOrigin() const
 	{ return origin; }
 
-	inline int16_t
+	inline coord_t
 	getX() const
 	{ return origin.getX(); }
 
-	inline int16_t
+	inline coord_t
 	getY() const
 	{ return origin.getY(); }
 
 	// setter origin
 	inline void
-	setX(int16_t x)
+	setX(coord_t x)
 	{ origin.setX(x); }
 
 	inline void
-	setY(int16_t y)
+	setY(coord_t y)
 	{ origin.setY(y); }
 
 	inline void
@@ -99,7 +99,7 @@ public:
 	{ origin = position; }
 
 	inline void
-	moveTo(int16_t x, int16_t y)
+	moveTo(coord_t x, coord_t y)
 	{ origin = Point(x, y); }
 
 
@@ -108,11 +108,11 @@ public:
 	getSize() const
 	{ return size; }
 
-	inline int16_t
+	inline coord_t
 	getWidth() const
 	{ return size.getWidth(); }
 
-	inline int16_t
+	inline coord_t
 	getHeight() const
 	{ return size.getHeight(); }
 
@@ -122,63 +122,63 @@ public:
 	{ this->size = size; }
 
 	inline void
-	setWidth(int16_t width)
+	setWidth(coord_t width)
 	{ size.setWidth(width); }
 
 	inline void
-	setHeight(int16_t height)
+	setHeight(coord_t height)
 	{ size.setHeight(height); }
 
 
 	// getter lines
-	inline int16_t
+	inline coord_t
 	getBottom() const
 	{ return getY() + getHeight(); }
 
-	inline int16_t
+	inline coord_t
 	getTop() const
 	{ return getY(); }
 
-	inline int16_t
+	inline coord_t
 	getLeft() const
 	{ return getX(); }
 
-	inline int16_t
+	inline coord_t
 	getRight() const
 	{ return getX() + getWidth(); }
 
 	// setter lines
 	inline void
-	setBottom(int16_t y)
+	setBottom(coord_t y)
 	{ setHeight(y - getTop()); }
 
 	inline void
-	setTop(int16_t y)
+	setTop(coord_t y)
 	{ setHeight(getBottom() - y); setY(y); }
 
 	inline void
-	setLeft(int16_t x)
+	setLeft(coord_t x)
 	{ setWidth(getRight() - x); setX(x); }
 
 	inline void
-	setRight(int16_t x)
+	setRight(coord_t x)
 	{ setWidth(x - getLeft()); }
 
 	// move setter lines
 	inline void
-	moveBottom(int16_t y)
+	moveBottom(coord_t y)
 	{ setY(y - getHeight()); }
 
 	inline void
-	moveTop(int16_t y)
+	moveTop(coord_t y)
 	{ setY(y); }
 
 	inline void
-	moveLeft(int16_t x)
+	moveLeft(coord_t x)
 	{ setX(x); }
 
 	inline void
-	moveRight(int16_t x)
+	moveRight(coord_t x)
 	{ setX(x - getWidth()); }
 
 
@@ -243,7 +243,7 @@ public:
 
 
 	inline void
-	translate(int16_t dx, int16_t dy)
+	translate(coord_t dx, coord_t dy)
 	{ origin += Point(dx, dy); }
 
 	inline void
@@ -251,7 +251,7 @@ public:
 	{ origin += offset; }
 
 	inline Rect
-	translated(int16_t dx, int16_t dy) const
+	translated(coord_t dx, coord_t dy) const
 	{ return Rect(origin + Point(dx, dy), size); }
 
 	inline Rect
@@ -288,7 +288,7 @@ public:
 	{ return contains(point.getX(), point.getY()); }
 
 	inline bool
-	contains(int16_t x, int16_t y) const
+	contains(coord_t x, coord_t y) const
 	{
 		// left <= x <= right and top <= y <= bottom
 		// we have to check all four anyway

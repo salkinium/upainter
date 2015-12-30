@@ -40,8 +40,8 @@ modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor color, C
 		if (eY < clip.getTop() or bY > clip.getBottom()) return;
 
 		// clip vertical length
-		bY = xpcc::max(bY, clip.getTop());
-		eY = xpcc::min(eY, clip.getBottom());
+		bY = xpcc::max(bY, int16_t(clip.getTop()));
+		eY = xpcc::min(eY, int16_t(clip.getBottom()));
 		// draw visible and clipped line
 		drawVerticalLine(bX, bY, eY, color, composition);
 		return;
@@ -58,8 +58,8 @@ modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor color, C
 		if (eX < clip.getLeft() or bX > clip.getRight()) return;
 
 		// clip horizontal length
-		bX = xpcc::max(bX, clip.getLeft());
-		eX = xpcc::min(eX, clip.getRight());
+		bX = xpcc::max(bX, int16_t(clip.getLeft()));
+		eX = xpcc::min(eX, int16_t(clip.getRight()));
 		// draw visible and clipped line
 		drawHorizontalLine(bY, bX, eX, color, composition);
 		return;
@@ -622,7 +622,7 @@ modm::ges::Painter<Format>::drawHorizontalLineClipped(int16_t y, int16_t beginX,
 		if (likely(beginX <= cR))
 		{
 			// line starts before right of clip window
-			drawHorizontalLine(y, std::max(beginX, clip.getLeft()), std::min(endX, cR), color, composition);
+			drawHorizontalLine(y, std::max(beginX, int16_t(clip.getLeft())), std::min(endX, cR), color, composition);
 		}
 	}
 }
@@ -639,7 +639,7 @@ modm::ges::Painter<Format>::drawVerticalLineClipped(int16_t x, int16_t beginY, i
 		if (likely(beginY <= cB))
 		{
 			// line starts before right of clip window
-			drawVerticalLine(x, std::max(beginY, clip.getTop()), std::min(endY, cB), color, composition);
+			drawVerticalLine(x, std::max(beginY, int16_t(clip.getTop())), std::min(endY, cB), color, composition);
 		}
 	}
 }

@@ -58,6 +58,7 @@ HEADERS  += mainwindow.h \
     pixel_color/pixel_color_rgb332.hpp \
     painter_impl.hpp \
     geometry/ellipse.hpp \
-    color.hpp
+    color.hpp \
+    ges.hpp
 
 FORMS    += mainwindow.ui
