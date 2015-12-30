@@ -11,6 +11,37 @@
 
 #include <xpcc/architecture/utils.hpp>
 
+namespace modm { namespace ges {
+
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::Clear  {&Painter<Format>::NativeColor::Clear};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::A      {&Painter<Format>::NativeColor::A};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::B      {&Painter<Format>::NativeColor::B};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::AoverB {&Painter<Format>::NativeColor::AoverB};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::BoverA {&Painter<Format>::NativeColor::BoverA};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::AinB   {&Painter<Format>::NativeColor::AinB};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::BinA   {&Painter<Format>::NativeColor::BinA};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::AoutB  {&Painter<Format>::NativeColor::AoutB};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::BoutA  {&Painter<Format>::NativeColor::BoutA};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::AatopB {&Painter<Format>::NativeColor::AatopB};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::BatopA {&Painter<Format>::NativeColor::BatopA};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::Xor    {&Painter<Format>::NativeColor::Xor};
+template< PixelFormat Format >
+const typename Painter<Format>::CompositionOperator Painter<Format>::Plus   {&Painter<Format>::NativeColor::Plus};
+
+}}	// oooooh dear cthulhu, C++ is so frickin annoying sometimes.
+
 template< modm::ges::PixelFormat Format >
 void
 modm::ges::Painter<Format>::drawLine(const Line &line, const AlphaColor color, CompositionOperator composition, Rect clip)

@@ -36,25 +36,25 @@ public:
 
 public:
 	// native composition operators
-	static constexpr CompositionOperator Clear = &NativeColor::Clear;
+	static const CompositionOperator Clear;
 
-	static constexpr CompositionOperator A = &NativeColor::A;
-	static constexpr CompositionOperator B = &NativeColor::B;
+	static const CompositionOperator A;
+	static const CompositionOperator B;
 
-	static constexpr CompositionOperator AoverB = &NativeColor::AoverB;
-	static constexpr CompositionOperator BoverA = &NativeColor::BoverA;
+	static const CompositionOperator AoverB;
+	static const CompositionOperator BoverA;
 
-	static constexpr CompositionOperator AinB = &NativeColor::AinB;
-	static constexpr CompositionOperator BinA = &NativeColor::BinA;
+	static const CompositionOperator AinB;
+	static const CompositionOperator BinA;
 
-	static constexpr CompositionOperator AoutB = &NativeColor::AoutB;
-	static constexpr CompositionOperator BoutA = &NativeColor::BoutA;
+	static const CompositionOperator AoutB;
+	static const CompositionOperator BoutA;
 
-	static constexpr CompositionOperator AatopB = &NativeColor::AatopB;
-	static constexpr CompositionOperator BatopA = &NativeColor::BatopA;
+	static const CompositionOperator AatopB;
+	static const CompositionOperator BatopA;
 
-	static constexpr CompositionOperator Xor = &NativeColor::Xor;
-	static constexpr CompositionOperator Plus = &NativeColor::Plus;
+	static const CompositionOperator Xor;
+	static const CompositionOperator Plus;
 
 public:
 	Painter(Surface &surface) :
