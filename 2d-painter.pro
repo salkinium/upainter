@@ -59,6 +59,7 @@ HEADERS  += mainwindow.h \
     painter_impl.hpp \
     geometry/ellipse.hpp \
     color.hpp \
-    ges.hpp
+    ges.hpp \
+    fixed_point.hpp
 
 FORMS    += mainwindow.ui
