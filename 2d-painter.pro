@@ -29,7 +29,8 @@ LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
 SOURCES += main.cpp \
     mainwindow.cpp \
-    qdisplay.cpp
+    qdisplay.cpp \
+    ges/math/test/fixed_point_test.cpp
 
 HEADERS  += mainwindow.h \
     ges/surface.hpp \
@@ -58,6 +59,7 @@ HEADERS  += mainwindow.h \
     ges/geometry/ellipse.hpp \
     ges/color.hpp \
     ges/ges.hpp \
-    ges/math/fixed_point.hpp
+    ges/math/fixed_point.hpp \
+    ges/math/test/fixed_point_test.hpp
 
 FORMS    += mainwindow.ui
