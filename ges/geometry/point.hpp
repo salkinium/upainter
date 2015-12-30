@@ -10,7 +10,7 @@
 
 #include <xpcc/math/geometry/vector2.hpp>
 #include <xpcc/architecture/utils.hpp>
-#include <ges.hpp>
+#include "../ges.hpp"
 
 namespace modm
 {

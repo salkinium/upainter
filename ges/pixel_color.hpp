@@ -49,9 +49,9 @@ public:
 
 	constexpr
 	PixelColor(const uint8_t red, const uint8_t green, const uint8_t blue, const uint8_t alpha) :
-		parts{uint8_t((uint16_t(red) * alpha) / 255),
+		parts{uint8_t((uint16_t(red)   * alpha) / 255),
 			  uint8_t((uint16_t(green) * alpha) / 255),
-			  uint8_t((uint16_t(blue) * alpha) / 255),
+			  uint8_t((uint16_t(blue)  * alpha) / 255),
 			  alpha}
 	{}
 

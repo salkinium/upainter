@@ -10,7 +10,7 @@
 #endif
 
 #include <stdint.h>
-#include "pixel_format.hpp"
+#include "../pixel_format.hpp"
 
 namespace modm
 {

@@ -10,7 +10,7 @@
 
 #include <xpcc/utils/arithmetic_traits.hpp>
 #include <xpcc/math/geometry/vector.hpp>
-#include <fixed_point.hpp>
+#include "math/fixed_point.hpp"
 
 namespace modm
 {

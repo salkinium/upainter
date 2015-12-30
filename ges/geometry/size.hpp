@@ -9,7 +9,7 @@
 #define MODM_GES_SIZE_HPP
 
 #include <xpcc/math/geometry/vector2.hpp>
-#include <ges.hpp>
+#include "../ges.hpp"
 
 namespace modm
 {

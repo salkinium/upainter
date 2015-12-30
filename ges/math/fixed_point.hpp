@@ -275,7 +275,7 @@ public:
 	}
 
 	// division with assignment
-	CONSTEXPR14 fixed_point_t&
+	constexpr fixed_point_t&
 	operator /=(const fixed_point_t& rhs) {
 		WideType res = (WideType(ival) * one);	// the actual implementation
 		UnderlyingType h = rhs.ival / 2;
