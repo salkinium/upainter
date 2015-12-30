@@ -1,0 +1,28 @@
+env = Environment(tools = ['unittest', 'xpcc'], toolpath = ['../xpcc/scons/site_tools'],
+	configfile = 'unittest_hosted.cfg')
+
+# build the xpcc library
+xpccLibrary = env.XpccLibrary()
+
+files = env.FindFiles(path = '.', unittest=True)
+# declare a file which later runs all the tests
+template = ARGUMENTS.get('template', env['XPCC_CONFIG']['build']['template'])
+runner = env.UnittestRunner(target = env.Buildpath('runner.cpp'),
+							source = files.header,
+							template = template)
+
+sources = [runner] + files.sources
+
+# build the program
+program = env.Program(target = 'executable', source = sources)
+
+env.Alias('build', program)
+env.Alias('size', env.Size(program))
+env.Alias('symbols', env.Symbols(program))
+env.Alias('defines', env.ShowDefines())
+
+env.Alias('run', env.Run(program))
+env.Alias('all', ['build', 'run'])
+
+
+env.Default('all')
