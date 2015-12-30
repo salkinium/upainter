@@ -10,8 +10,8 @@
 
 #include <QGraphicsView>
 #include <QImage>
-#include "pixel_buffer.hpp"
-#include "surface.hpp"
+#include <ges/pixel_buffer.hpp>
+#include <ges/surface.hpp>
 
 namespace modm
 {

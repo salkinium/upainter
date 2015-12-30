@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui widgets
 
 TARGET = 2d-painter
 TEMPLATE = app
@@ -29,37 +27,37 @@ INCLUDEPATH += "$$PWD/xpcc/src"
 # point to where libxpcc.a is located
 LIBS += -L"$$PWD/xpcc/src" -lxpcc
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
     mainwindow.cpp \
     qdisplay.cpp
 
 HEADERS  += mainwindow.h \
-    surface.hpp \
-    pixel_format.hpp \
-    surface/surface_l1.hpp \
-    surface/surface_l4.hpp \
-    pixel_buffer.hpp \
+    ges/surface.hpp \
+    ges/pixel_format.hpp \
+    ges/surface/surface_l1.hpp \
+    ges/surface/surface_l4.hpp \
+    ges/pixel_buffer.hpp \
     qdisplay.hpp \
-    pixel_color.hpp \
-    geometry/point.hpp \
-    geometry/size.hpp \
-    geometry/line.hpp \
-    geometry/rect.hpp \
-    painter.hpp \
-    geometry/circle.hpp \
-    pixel_color/pixel_color_rgb8.hpp \
-    pixel_color/pixel_color_l1.hpp \
-    pixel_color/pixel_color_l2.hpp \
-    pixel_color/pixel_color_l4.hpp \
-    pixel_color/pixel_color_l8.hpp \
-    pixel_color/pixel_color_rgb1.hpp \
-    pixel_color/pixel_color_rgb565.hpp \
-    pixel_color/pixel_color_rgb4.hpp \
-    pixel_color/pixel_color_rgb332.hpp \
-    painter_impl.hpp \
-    geometry/ellipse.hpp \
-    color.hpp \
-    ges.hpp \
-    fixed_point.hpp
+    ges/pixel_color.hpp \
+    ges/geometry/point.hpp \
+    ges/geometry/size.hpp \
+    ges/geometry/line.hpp \
+    ges/geometry/rect.hpp \
+    ges/painter.hpp \
+    ges/geometry/circle.hpp \
+    ges/pixel_color/pixel_color_rgb8.hpp \
+    ges/pixel_color/pixel_color_l1.hpp \
+    ges/pixel_color/pixel_color_l2.hpp \
+    ges/pixel_color/pixel_color_l4.hpp \
+    ges/pixel_color/pixel_color_l8.hpp \
+    ges/pixel_color/pixel_color_rgb1.hpp \
+    ges/pixel_color/pixel_color_rgb565.hpp \
+    ges/pixel_color/pixel_color_rgb4.hpp \
+    ges/pixel_color/pixel_color_rgb332.hpp \
+    ges/painter_impl.hpp \
+    ges/geometry/ellipse.hpp \
+    ges/color.hpp \
+    ges/ges.hpp \
+    ges/math/fixed_point.hpp
 
 FORMS    += mainwindow.ui

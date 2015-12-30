@@ -9,10 +9,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "surface.hpp"
+#include <ges/surface.hpp>
 #include "qdisplay.hpp"
 #include <QTimer>
-#include "painter.hpp"
+#include <ges/painter.hpp>
 
 using namespace modm::ges;
 

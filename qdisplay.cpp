@@ -6,7 +6,7 @@
  * ------------------------------------------------------------------------ */
 
 #include "qdisplay.hpp"
-#include "pixel_color.hpp"
+#include <ges/pixel_color.hpp>
 
 #include <QDebug>
 
