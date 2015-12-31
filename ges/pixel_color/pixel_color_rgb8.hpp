@@ -99,7 +99,6 @@ public:
 	{ }
 
 
-
 	void	// compose(a, 255, 0);
 	AoverB(const ThisColor a)
 	{ A(a); }

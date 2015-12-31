@@ -19,7 +19,8 @@ namespace ges
 {
 
 //using coord_t = int16_t;			// for      aliased lines
-using coord_t =  modm::fix16_t<4>;	// for anti-aliased lines
+using coord_t = modm::fix16_t<4>;	// for anti-aliased lines
+//using coord_t = float;			// for  cyber-hyper lines
 
 using wide_coord_t = typename xpcc::ArithmeticTraits<coord_t>::WideType;
 using Vector  = xpcc::Vector<coord_t, 2>;

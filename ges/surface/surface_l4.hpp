@@ -65,7 +65,7 @@ public:
 	{ return Format; }
 
 	Rect
-	clip(Rect input = Rect()) const
+	clip(Rect input) const
 	{
 		if (input.isEmpty()) return getBounds();
 		return input.intersected(getBounds());
