@@ -48,7 +48,7 @@ public:
 
 	inline bool
 	isValid() const
-	{ return not isEmpty(); }
+	{ return size.isValid(); }
 
 
 	inline void

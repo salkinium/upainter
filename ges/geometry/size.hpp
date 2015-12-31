@@ -55,7 +55,7 @@ public:
 
 	inline bool isValid() const
 	{
-		return (vector >= Vector(0,0));
+		return (vector > Vector(0,0));
 	}
 
 	inline bool isNull() const

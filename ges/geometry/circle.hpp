@@ -35,7 +35,7 @@ public:
 
 	inline bool
 	isEmpty() const
-	{ return radius < 0; }
+	{ return radius <= 0; }
 
 	inline bool
 	isNull() const
@@ -43,7 +43,7 @@ public:
 
 	inline bool
 	isValid() const
-	{ return not isEmpty(); }
+	{ return radius > 0; }
 
 
 	inline Rect
