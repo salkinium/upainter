@@ -57,87 +57,62 @@ public:
 	static const CompositionOperator Plus;
 
 public:
-	Painter(Surface &surface) :
-		surface(surface) {}
-
-
-	inline void
-	drawLine(const Line &line, const AlphaColor color, Rect clip)
-	{ drawLine(line, color, A, clip); }
+	Painter(Surface &surface);
 
 	void
-	drawLine(const Line &line, const AlphaColor color, CompositionOperator composition = A, Rect clip = Rect());
+	setClipArea(const Rect &clip);
+	void
+	resetClipArea();
 
-
-	inline void
-	drawRect(const Rect &rectangle, const AlphaColor color, Rect clip)
-	{ drawRect(rectangle, color, A, clip); }
 
 	void
-	drawRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
+	drawLine(const Line &line, const AlphaColor color, CompositionOperator composition = A);
 
-
-	inline void
-	fillRect(const Rect &rectangle, const AlphaColor color, Rect clip)
-	{ fillRect(rectangle, color, A, clip); }
 
 	void
-	fillRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
+	drawRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition = A);
 
-
-	inline void
-	drawCircle(const Circle &circle, const AlphaColor color, Rect clip)
-	{ drawCircle(circle, color, A, clip); }
 
 	void
-	drawCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
+	fillRect(const Rect &rectangle, const AlphaColor color, const CompositionOperator composition = A);
 
-
-	inline void
-	fillCircle(const Circle &circle, const AlphaColor color, Rect clip)
-	{ fillCircle(circle, color, A, clip); }
 
 	void
-	fillCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
+	drawCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition = A);
 
-
-	inline void
-	drawEllipse(const Ellipse &ellipse, const AlphaColor color, Rect clip)
-	{ drawEllipse(ellipse, color, A, clip); }
 
 	void
-	drawEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
-
-
-	inline void
-	fillEllipse(const Ellipse &ellipse, const AlphaColor color, Rect clip)
-	{ fillEllipse(ellipse, color, A, clip); }
+	fillCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition = A);
 
 	void
-	fillEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition = A, Rect clip = Rect());
+	drawEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition = A);
+
+
+	void
+	fillEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition = A);
 
 
 protected:
 	inline void
-	drawEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip);
+	drawEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition);
 
 	inline void
-	drawOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip);
+	drawOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition);
 
 	inline void
-	fillEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip);
+	fillEvenEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition);
 
 	inline void
-	fillOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition, const Rect &clip);
+	fillOddEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition);
 
 
 protected:
 	inline void
-	drawHorizontalLineClipped(int16_t y, int16_t beginX, int16_t endX, const Rect &clip,
+	drawHorizontalLineClipped(int16_t y, int16_t beginX, int16_t endX,
 							  const AlphaColor color, const CompositionOperator composition);
 
 	inline void
-	drawVerticalLineClipped(int16_t x, int16_t beginY, int16_t endY, const Rect &clip,
+	drawVerticalLineClipped(int16_t x, int16_t beginY, int16_t endY,
 							  const AlphaColor color, const CompositionOperator composition);
 
 
@@ -152,6 +127,7 @@ protected:
 
 private:
 	Surface &surface;
+	Rect clipRect;
 };
 
 } // namespace ges
