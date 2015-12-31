@@ -117,12 +117,18 @@ public:
 		fixed_point_t fp(*this);
 		return (fp += rhs);
 	}
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
 	constexpr fixed_point_t
-	operator +(const ArithmeticType& rhs) const {
+	operator +(const IntegralType& rhs) const {
 		fixed_point_t fp(*this);
 		return (fp += fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator +(const FloatingPointType& rhs) const {
+		return FloatingPointType(*this) + rhs;
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -156,17 +162,23 @@ public:
 	}
 
 	// subtraction
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr fixed_point_t
-	operator -(const ArithmeticType& rhs) const {
-		fixed_point_t fp(*this);
-		return (fp -= fixed_point_t(rhs));
-	}
 	constexpr fixed_point_t
 	operator -(const fixed_point_t& rhs) const {
 		fixed_point_t fp(*this);
 		return (fp -= rhs);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator -(const IntegralType& rhs) const {
+		fixed_point_t fp(*this);
+		return (fp -= fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator -(const FloatingPointType& rhs) const {
+		return FloatingPointType(*this) - rhs;
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -205,12 +217,18 @@ public:
 		fixed_point_t fp(*this);
 		return (fp *= rhs);
 	}
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
 	constexpr fixed_point_t
-	operator *(const ArithmeticType& rhs) const {
+	operator *(const IntegralType& rhs) const {
 		fixed_point_t fp(*this);
 		return (fp *= fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator *(const FloatingPointType& rhs) const {
+		return FloatingPointType(*this) * rhs;
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -224,7 +242,6 @@ public:
 	operator *(const FloatingPointType& lhs, const fixed_point_t& rhs) {
 		return lhs * FloatingPointType(rhs);
 	}
-	//	return (lhs * WideType(rhs) + half) / one;
 
 	// multiplcation with assignment
 	constexpr fixed_point_t&
@@ -254,18 +271,25 @@ public:
 		fixed_point_t fp(*this);
 		return (fp /= rhs);
 	}
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
 	constexpr fixed_point_t
-	operator /(const ArithmeticType& rhs) const {
+	operator /(const IntegralType& rhs) const {
 		fixed_point_t fp(*this);
 		return (fp /= fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator /(const FloatingPointType& rhs) const {
+		return FloatingPointType(*this) / rhs;
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
 	constexpr friend fixed_point_t
 	operator /(const IntegralType& lhs, const fixed_point_t& rhs) {
-		return fixed_point_t(lhs) /= rhs;
+		fixed_point_t fp(lhs);
+		return fp /= rhs;
 	}
 	template< typename FloatingPointType,
 			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
@@ -312,15 +336,21 @@ public:
 	operator >>=(const int shift) = delete;
 
 	// comparisons: equal
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator ==(const ArithmeticType& rhs) const {
-		return (*this == fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator ==(const fixed_point_t& rhs) const {
 		return (ival == rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator ==(const IntegralType& rhs) const {
+		return (*this == fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator ==(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) == rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -329,15 +359,21 @@ public:
 		return rhs == lhs;
 	}
 	// comparisons: not equal
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator !=(const ArithmeticType& rhs) const {
-		return (*this != fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator !=(const fixed_point_t& rhs) const {
 		return (ival != rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator !=(const IntegralType& rhs) const {
+		return (*this != fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator !=(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) != rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -347,15 +383,21 @@ public:
 	}
 
 	// comparisons: less or equal
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator <(const ArithmeticType& rhs) const {
-		return (*this < fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator <(const fixed_point_t& rhs) const {
 		return (ival < rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator <(const IntegralType& rhs) const {
+		return (*this < fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator <(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) < rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -365,15 +407,21 @@ public:
 	}
 
 	// comparisons: less or equal
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator <=(const ArithmeticType& rhs) const {
-		return (*this <= fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator <=(const fixed_point_t& rhs) const {
 		return (ival <= rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator <=(const IntegralType& rhs) const {
+		return (*this <= fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator <=(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) <= rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -383,15 +431,21 @@ public:
 	}
 
 	// comparisons: greater
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator >(const ArithmeticType& rhs) const {
-		return (*this > fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator >(const fixed_point_t& rhs) const {
 		return (ival > rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator >(const IntegralType& rhs) const {
+		return (*this > fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator >(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) > rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -400,15 +454,21 @@ public:
 		return rhs < lhs;
 	}
 	// comparisons: greater or equal
-	template< typename ArithmeticType,
-			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
-	constexpr bool
-	operator >=(const ArithmeticType& rhs) const {
-		return (*this >= fixed_point_t(rhs));
-	}
 	constexpr bool
 	operator >=(const fixed_point_t& rhs) const {
 		return (ival >= rhs.ival);
+	}
+	template< typename IntegralType,
+			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
+	constexpr fixed_point_t
+	operator >=(const IntegralType& rhs) const {
+		return (*this >= fixed_point_t(rhs));
+	}
+	template< typename FloatingPointType,
+			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
+	constexpr FloatingPointType
+	operator >=(const FloatingPointType& rhs) const {
+		return (FloatingPointType(*this) >= rhs);
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
