@@ -8,7 +8,6 @@
 #ifndef MODM_GES_LINE_HPP
 #define MODM_GES_LINE_HPP
 
-#include <xpcc/math/geometry/vector2.hpp>
 #include "point.hpp"
 
 namespace modm
@@ -20,9 +19,8 @@ namespace ges
 class Line
 {
 public:
-	inline
-	Line() :
-		p1(0,0), p2(0,0) {}
+	inline Line() = default;
+	inline Line(const Line&) = default;
 
 	inline
 	Line(coord_t x1, coord_t y1, coord_t x2, coord_t y2) :
@@ -30,20 +28,16 @@ public:
 
 	inline
 	Line(const Point &p1, const Point &p2) :
-		p1(p1.vector), p2(p2.vector) {}
+		p1(p1), p2(p2) {}
 
 	inline
 	Line(const Point &p) :
-		p1(0,0), p2(p.vector) {}
-
-	inline
-	Line(const Line &l) :
-		p1(l.p1), p2(l.p2) {}
+		p1(0,0), p2(p) {}
 
 
 	inline Rect
 	getBounds() const
-	{ return Rect(Point(p1), Point(p2)); }
+	{ return Rect(p1, p2); }
 
 
 	inline coord_t
@@ -70,15 +64,15 @@ public:
 
 	inline void
 	setP1(const Point &p1)
-	{ this->p1 = p1.vector; }
+	{ this->p1 = p1; }
 
 	inline void
 	setP2(const Point &p2)
-	{ this->p2 = p2.vector; }
+	{ this->p2 = p2; }
 
 	inline void
 	setPoints(const Point &p1, const Point &p2)
-	{ this->p1 = p1.vector; this->p2 = p2.vector; }
+	{ this->p1 = p1; this->p2 = p2; }
 
 
 	inline coord_t
@@ -105,40 +99,38 @@ public:
 
 	inline float
 	getLength() const
-	{ return Point(p1).distance(p2); }
+	{ return p1.distance(p2); }
 
 	inline uint32_t
 	getLengthSquared() const
-	{ return Point(p1).distanceSquared(p2); }
+	{ return p1.distanceSquared(p2); }
 
 
 	inline void
 	translate(const Point &offset)
 	{
-		p1 += offset.vector;
-		p2 += offset.vector;
+		p1 += offset;
+		p2 += offset;
 	}
 
 	inline void
 	translate(coord_t dx, coord_t dy)
 	{
-		p1 += Vector(dx, dy);
-		p2 += Vector(dx, dy);
+		translate(Point(dx, dy));
 	}
 
 
 	inline Line
 	translated(const Point &offset) const
 	{
-		return Line(p1 + offset.vector,
-					p2 + offset.vector);
+		return Line(p1 + offset,
+					p2 + offset);
 	}
 
 	inline Line
 	translated(coord_t dx, coord_t dy) const
 	{
-		return Line(p1 + Vector(dx, dy),
-					p2 + Vector(dx, dy));
+		return translated(Point(dx, dy));
 	}
 
 	inline Line
@@ -162,8 +154,8 @@ public:
 	{ return (p1 == p2); }
 
 private:
-	Vector p1;
-	Vector p2;
+	Point p1{0,0};
+	Point p2{0,0};
 
 	friend class Rect;
 };
