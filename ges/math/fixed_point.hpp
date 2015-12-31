@@ -556,9 +556,7 @@ template<typename OU, uint8_t OF>
 constexpr modm::fixed_point_t<OU, OF>
 floor(const modm::fixed_point_t<OU, OF>& fp) {
 	typename modm::fixed_point_t<OU, OF>::UnderlyingType v{fp.value()};
-	if (v < 0) {
-		v -= ((1 << OF) - 1) - (1 << OF);
-	}
+//	if (v < 0) v += 1;
 	v &= ~((1 << OF) - 1);
 	return *reinterpret_cast<modm::fixed_point_t<OU, OF>*>(&v);
 }
@@ -579,9 +577,7 @@ constexpr modm::fixed_point_t<OU, OF>
 trunc(const modm::fixed_point_t<OU, OF>& fp) {
 	typename modm::fixed_point_t<OU, OF>::UnderlyingType v{fp.value()};
 	v &= ~((1 << OF) - 1);
-	if (v < 0) {
-		v += (1 << OF);
-	}
+	if (v < 0) v += (1 << OF);
 	return *reinterpret_cast<modm::fixed_point_t<OU, OF>*>(&v);
 }
 
@@ -589,9 +585,7 @@ template<typename OU, uint8_t OF>
 constexpr modm::fixed_point_t<OU, OF>
 abs(const modm::fixed_point_t<OU, OF>& fp) {
 	modm::fixed_point_t<OU, OF> v{fp};
-	if (v < 0) {
-		v = -v;
-	}
+	if (v < 0) v = -v;
 	return v;
 }
 
