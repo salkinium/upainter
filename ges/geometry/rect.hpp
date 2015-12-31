@@ -22,8 +22,8 @@ namespace ges
 class Rect
 {
 public:
-	inline
-	Rect() {}
+	inline Rect() = default;
+	inline Rect(const Rect&) = default;
 
 	inline explicit
 	Rect(const Point &topLeft, const Point &bottomRight) :
@@ -36,10 +36,6 @@ public:
 	inline
 	Rect(coord_t x, coord_t y, coord_t width, coord_t height) :
 		origin(x, y), size(width, height) {}
-
-	inline
-	Rect(const Rect &rect) :
-		origin(rect.origin), size(rect.size) {}
 
 
 	inline bool

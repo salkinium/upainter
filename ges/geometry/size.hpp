@@ -24,19 +24,12 @@ class Size
 		vector(vector) {}
 
 public:
-	inline
-	Size() :
-		vector(-1, -1)
-	{}
+	inline Size() = default;
+	inline Size(const Size&) = default;
 
 	inline
 	Size(coord_t width, coord_t height) :
 		vector(width, height)
-	{}
-
-	inline
-	Size(const Size &size) :
-		vector(size.vector)
 	{}
 
 	inline coord_t
@@ -114,7 +107,7 @@ public:
 	{ return vector >= rhs.vector; }
 
 private:
-	Vector vector;
+	Vector vector{-1,-1};
 
 	friend class Rect;
 	friend class Size;

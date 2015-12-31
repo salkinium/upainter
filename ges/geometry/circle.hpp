@@ -21,9 +21,8 @@ namespace ges
 class Circle
 {
 public:
-	inline
-	Circle() :
-		origin(0,0), radius(0) {}
+	inline Circle() = default;
+	inline Circle(const Circle&) = default;
 
 	inline
 	Circle(coord_t x, coord_t y, coord_t radius) :
@@ -225,7 +224,7 @@ public:
 
 private:
 	Point origin;
-	coord_t radius;
+	coord_t radius{0};
 };
 
 } // namespace ges

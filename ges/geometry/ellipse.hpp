@@ -20,9 +20,8 @@ namespace ges
 class Ellipse
 {
 public:
-	inline
-	Ellipse() :
-		origin(0,0), size(-1,-1) {}
+	inline Ellipse() = default;
+	inline Ellipse(const Ellipse&) = default;
 
 	inline
 	Ellipse(coord_t x, coord_t y, coord_t xRadius, coord_t yRadius) :

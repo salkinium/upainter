@@ -27,19 +27,12 @@ Point
 	{}
 
 public:
-	inline
-	Point() :
-		vector(0, 0)
-	{}
+	inline Point() = default;
+	inline Point(const Point&) = default;
 
 	inline
 	Point(coord_t x, coord_t y) :
 		vector(x, y)
-	{}
-
-	inline
-	Point(const Point &point) :
-		vector(point.vector)
 	{}
 
 	inline coord_t
@@ -143,7 +136,7 @@ public:
 	{ return vector >= rhs.vector; }
 
 private:
-	Vector vector;
+	Vector vector{0,0};
 
 	friend class Rect;
 	friend class Point;
