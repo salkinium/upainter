@@ -44,7 +44,7 @@ const typename Painter<Format>::CompositionOperator Painter<Format>::Plus   {&Pa
 
 
 template< modm::ges::PixelFormat Format >
-modm::ges::Painter<Format>::Painter(Surface &surface) : surface(surface), clipRect(surface.getBounds()) {}
+modm::ges::Painter<Format>::Painter(NativeSurface &surface) : surface(surface), clipRect(surface.getBounds()) {}
 
 template< modm::ges::PixelFormat Format >
 void

@@ -28,8 +28,8 @@ template< PixelFormat Format >
 class Painter
 {
 public:
-	using Surface = Surface<Format>;
-	using NativeColor = typename Surface::NativeColor;
+	using NativeSurface = Surface<Format>;
+	using NativeColor = typename NativeSurface::NativeColor;
 	using AlphaColor = typename NativeColor::AlphaColor;
 
 	using CompositionOperator = void (NativeColor::*)(const AlphaColor);
@@ -57,7 +57,7 @@ public:
 	static const CompositionOperator Plus;
 
 public:
-	Painter(Surface &surface);
+	Painter(NativeSurface &surface);
 
 	void
 	setClipArea(const Rect &clip);
@@ -126,7 +126,7 @@ protected:
 					 const AlphaColor color, const CompositionOperator composition);
 
 private:
-	Surface &surface;
+	NativeSurface &surface;
 	Rect clipRect;
 };
 
