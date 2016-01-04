@@ -7,8 +7,12 @@
 
 #include "fixed_point_test.hpp"
 
+using modm::fix8_t;
 using modm::fix16_t;
+using modm::fix32_t;
+using modm::ufix8_t;
 using modm::ufix16_t;
+using modm::ufix32_t;
 
 void
 FixedPointTest::testConstruction()
@@ -313,6 +317,83 @@ FixedPointTest::testCasting()
 		f = fpn;
 		TEST_ASSERT_EQUALS(-5.125f, f);
 	}
+}
+
+void
+FixedPointTest::testImplicitConversions()
+{
+	/* The fixed point class should always implicitly convert to the type with larger precision
+	 * These are the rules when operations between different types are performed:
+	 *   - integers get promoted to fixed point type.
+	 *   - fixed point types get promoted to fixed point types with larger fractional size.
+	 *   - fixed point types get promoted to fixed point types with larger underlying type.
+	 *   - fixed point types get promoted to (double) floating point.
+	 */
+	#define TEST_ASSERT_SAME_TYPE(lhs_t, rhs_t, result_t) \
+	{ \
+		lhs_t lhs = 2; \
+		rhs_t rhs = 2; \
+		auto res_addition = lhs + rhs; \
+		auto res_subtraction = lhs - rhs; \
+		auto res_multiplication = lhs * rhs; \
+		auto res_division = lhs / rhs; \
+		bool result_addition = std::is_same<decltype(res_addition), result_t>::value; \
+		bool result_subtraction = std::is_same<decltype(res_subtraction), result_t>::value; \
+		bool result_multiplication = std::is_same<decltype(res_multiplication), result_t>::value; \
+		bool result_division = std::is_same<decltype(res_division), result_t>::value; \
+		TEST_ASSERT_TRUE(result_addition); \
+		TEST_ASSERT_TRUE(result_subtraction); \
+		TEST_ASSERT_TRUE(result_multiplication); \
+		TEST_ASSERT_TRUE(result_division); \
+	}
+
+	// -> integers get promoted to fixed point type.
+	// 8 bit
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, uint8_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>,  int8_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(uint8_t, fix16_t<4>, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE( int8_t, fix16_t<4>, fix16_t<4>);
+
+	// 16 bit
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, uint16_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>,  int16_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(uint16_t, fix16_t<4>, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE( int16_t, fix16_t<4>, fix16_t<4>);
+
+	// 32 bit
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, uint32_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>,  int32_t, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(uint32_t, fix16_t<4>, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE( int32_t, fix16_t<4>, fix16_t<4>);
+
+	// -> fixed point types get promoted to fixed point types with larger fractional size.
+	// same fractional size, same underlying typ
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, fix16_t<4>, fix16_t<4>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, fix16_t<4>, fix16_t<4>);
+	// different fractional size, same underlying typ
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, fix16_t<5>, fix16_t<5>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<5>, fix16_t<4>, fix16_t<5>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<2>, fix16_t<9>, fix16_t<9>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<9>, fix16_t<2>, fix16_t<9>);
+
+	// -> fixed point types get promoted to fixed point types with larger fractional size.
+	// same fractional size, different underlying typ
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, fix32_t<4>, fix32_t<4>);
+	TEST_ASSERT_SAME_TYPE(fix32_t<4>, fix16_t<4>, fix32_t<4>);
+	// different fractional size, different underlying typ
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, fix32_t<5>, fix32_t<5>);
+	TEST_ASSERT_SAME_TYPE(fix32_t<4>, fix16_t<5>, fix32_t<5>);
+	TEST_ASSERT_SAME_TYPE(fix16_t<5>, fix32_t<4>, fix32_t<5>);
+	TEST_ASSERT_SAME_TYPE(fix32_t<5>, fix16_t<4>, fix32_t<5>);
+
+	// -> fixed point types get promoted to (double) floating point.
+	// float
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, float, float);
+	TEST_ASSERT_SAME_TYPE(float, fix16_t<4>, float);
+	TEST_ASSERT_SAME_TYPE(fix16_t<4>, double, double);
+	TEST_ASSERT_SAME_TYPE(double, fix16_t<4>, double);
+
+	#undef TEST_ASSERT_SAME_TYPE
 }
 
 void

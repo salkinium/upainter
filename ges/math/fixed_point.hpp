@@ -27,6 +27,7 @@ class fixed_point_t
 
 	static_assert(F < sizeof(U) * 8, "Fractional size cannot be larger than underlying type!");
 	static_assert(F > 0, "Fractional size must be larger than 0!");
+	static_assert(std::is_integral<U>::value, "Underlying Type must be an intergal!");
 
 	static constexpr U one{1 << F};
 	static constexpr U half{1 << (F - 1)};
@@ -35,6 +36,8 @@ class fixed_point_t
 	static constexpr float halfeps{1.f/(1 << (F+1))};
 
 	using WideType = typename xpcc::ArithmeticTraits<U>::WideType;
+	template<typename RU, uint8_t RF>
+	using fpc_t = fixed_point_t<std::conditional_t<(sizeof(U) > sizeof(RU)), U, RU>, (F > RF ? F : RF)>;
 
 public:
 	static constexpr uint8_t Fractions = F;
@@ -112,10 +115,11 @@ public:
 	}
 
 	// addition
-	constexpr fixed_point_t
-	operator +(const fixed_point_t& rhs) const {
-		fixed_point_t fp(*this);
-		return (fp += rhs);
+	template<typename OU, uint8_t OF>
+	constexpr fpc_t<OU, OF>
+	operator +(const fixed_point_t<OU, OF>& rhs) const {
+		fpc_t<OU, OF> fp(*this);
+		return (fp += fpc_t<OU, OF>(rhs));
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -134,7 +138,7 @@ public:
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
 	constexpr friend fixed_point_t
 	operator +(const IntegralType& lhs, const fixed_point_t& rhs) {
-		return rhs + lhs;
+		return fixed_point_t(lhs) + rhs;
 	}
 	template< typename FloatingPointType,
 			  typename = std::enable_if_t< std::is_floating_point<FloatingPointType>::value > >
@@ -162,10 +166,11 @@ public:
 	}
 
 	// subtraction
-	constexpr fixed_point_t
-	operator -(const fixed_point_t& rhs) const {
-		fixed_point_t fp(*this);
-		return (fp -= rhs);
+	template<typename OU, uint8_t OF>
+	constexpr fpc_t<OU, OF>
+	operator -(const fixed_point_t<OU, OF>& rhs) const {
+		fpc_t<OU, OF> fp(*this);
+		return (fp -= fpc_t<OU, OF>(rhs));
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -194,15 +199,15 @@ public:
 	}
 
 	// subtraction with assignment
+	constexpr fixed_point_t&
+	operator -=(const fixed_point_t& rhs) {
+		return ival -= rhs.ival, *this;		// the actual implementation
+	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
 	constexpr fixed_point_t&
 	operator -=(const ArithmeticType& rhs) {
 		return *this -= fixed_point_t(rhs);
-	}
-	constexpr fixed_point_t&
-	operator -=(const fixed_point_t& rhs) {
-		return ival -= rhs.ival, *this;		// the actual implementation
 	}
 	template< typename ArithmeticType,
 			  typename = std::enable_if_t< std::is_arithmetic<ArithmeticType>::value > >
@@ -212,10 +217,11 @@ public:
 	}
 
 	// multiplication
-	constexpr fixed_point_t
-	operator *(const fixed_point_t& rhs) const {
-		fixed_point_t fp(*this);
-		return (fp *= rhs);
+	template<typename OU, uint8_t OF>
+	constexpr fpc_t<OU, OF>
+	operator *(const fixed_point_t<OU, OF>& rhs) const {
+		fpc_t<OU, OF> fp(*this);
+		return (fp *= fpc_t<OU, OF>(rhs));
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >
@@ -266,10 +272,11 @@ public:
 	}
 
 	// division
-	constexpr fixed_point_t
-	operator /(const fixed_point_t& rhs) const {
-		fixed_point_t fp(*this);
-		return (fp /= rhs);
+	template<typename OU, uint8_t OF>
+	constexpr fpc_t<OU, OF>
+	operator /(const fixed_point_t<OU, OF>& rhs) const {
+		fpc_t<OU, OF> fp(*this);
+		return (fp /= fpc_t<OU, OF>(rhs));
 	}
 	template< typename IntegralType,
 			  typename = std::enable_if_t< std::is_integral<IntegralType>::value > >

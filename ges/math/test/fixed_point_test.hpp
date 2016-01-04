@@ -28,6 +28,9 @@ public:
 	testCasting();
 
 	void
+	testImplicitConversions();
+
+	void
 	testAddition();
 
 	void
