@@ -335,7 +335,7 @@ void
 modm::ges::Painter<Format>::drawCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition)
 {
 	// we don't draw empty circles
-	if (unlikely(circle.isEmpty())) return;
+	if (unlikely(not circle.isValid())) return;
 
 	// only draw intersecting circles
 	if (unlikely(not circle.intersects(clipRect))) return;
@@ -385,7 +385,7 @@ void
 modm::ges::Painter<Format>::fillCircle(const Circle &circle, const AlphaColor color, const CompositionOperator composition)
 {
 	// we don't draw empty circles
-	if (unlikely(circle.isEmpty())) return;
+	if (unlikely(not circle.isValid())) return;
 
 	// only draw intersecting circles
 	if (unlikely(not circle.intersects(clipRect))) return;
@@ -434,7 +434,7 @@ void
 modm::ges::Painter<Format>::drawEllipse(const Ellipse &ellipse, const AlphaColor color, const CompositionOperator composition)
 {
 	// we don't draw empty circles
-	if (unlikely(ellipse.isEmpty())) return;
+	if (unlikely(not ellipse.isValid())) return;
 
 	// only draw intersecting circles
 	if (unlikely(not ellipse.intersects(clipRect))) return;
