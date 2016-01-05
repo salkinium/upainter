@@ -1,4 +1,4 @@
 [submodule "xpcc"]
 	path = xpcc
-	url = https://github.com/roboterclubaachen/xpcc.git
-	branch = develop
+	url = https://github.com/salkinium/xpcc.git
+	branch = project/upainter
